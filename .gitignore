@@ -1,0 +1,115 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+
+# Intermediate files
+*.ilk
+*.lastbuildstate
+*.log
+*.map
+*.opensdf
+*.res
+*.sdf
+*.suo
+*.tlog
+*.exp
+
+# Debug files
+*.idb
+*.pdb
+*.opendb
+*.vspx
+*.db
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+# *.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+# *.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Individual files and folders
+*.bak
+*.cfg
+bin/*
+/design
+/installer/Timestamp.txt
+/installer/Revision.h
+screenshots/
+making/
+Debug/
+Release/
+Deploy/
+DerivedData/
+*.log
+temp/*
+**/.vs/
+**/manifest/*
+applications/Python/server/app/static/images/emoji_activate
+applications/Python/server/app/static/images/emoji_import
+common/ampm/node_modules/*
+
+# Mac OS X cruft
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.user
+*.xccheckout
+project.xcworkspace
+xcuserdata/
+.DS_Store
+**/xcode/build
+.python-version
+# Signed Distance Field Fonts
+*.sdft
+
+# Javascript
+*/node_modules/*
+
+# Local files to ignore
+**/installer/revision.h
+**/installer/timestamp.txt
+imgui.ini
+ampm-restart.json
+ampm-state.json
+/applications/TheGlobe/assets/textures/background.png
+/GlobeAssets.zip
+/applications/TheGlobe/assets/fonts/HelveticaNeue.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-UltraLightItalic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-UltraLight.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-ThinItalic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-Thin.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-MediumItalic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-Medium.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-LightItalic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-Light.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-Italic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-CondensedBold.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-CondensedBlack.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-BoldItalic.ttf
+/applications/TheGlobe/assets/fonts/HelveticaNeue-Bold.ttf
+/applications/TheGlobe/assets/fonts/helvetica-neue-medium.ttf
+/applications/TheGlobe/assets/fonts/helvetica-neue-bold.ttf
+/common/ampm/node_modules
+
+
+# Always keep this
+!**/.gitkeep
+applications/TheGlobe/vc2015/x64/
