@@ -2,7 +2,6 @@
 
 uniform sampler2D	uTexNormal;
 uniform mat3 ciNormalMatrix;
-uniform float	uTime;
 
 in vec2		vertTexCoord0;
 in vec4		vertPosition;

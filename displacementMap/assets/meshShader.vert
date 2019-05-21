@@ -4,6 +4,7 @@ uniform mat4	ciModelView;
 uniform mat4	ciModelViewProjection;
 uniform mat3	ciNormalMatrix;
 uniform sampler2D uTexDisplacement;
+uniform float	uOffset;
 
 in vec4			ciPosition;
 in vec3			ciNormal;
@@ -36,7 +37,7 @@ void main()
 
 	// now take the vertex and displace it along its normal
 	vec4 displacedPosition = ciPosition;
-	displacedPosition.xyz += ciNormal * displacement - vec3(0.0, 30.0, 0.0);
+	displacedPosition.xyz += ciNormal * displacement + vec3(0.0, uOffset, 0.0);
 
 	// pass the surface normal and texture coordinate on to the fragment shader
 	vertNormal = ciNormal;

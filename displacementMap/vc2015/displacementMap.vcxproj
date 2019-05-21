@@ -107,13 +107,17 @@
     <None Include="..\assets\meshShader.vert" />
     <None Include="..\assets\normal_map.frag" />
     <None Include="..\assets\normal_map.vert" />
+    <None Include="..\assets\ripple_map.frag" />
+    <None Include="..\assets\ripple_map.vert" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <ClCompile Include="..\src\displacementMapApp.cpp" />
+    <ClCompile Include="..\src\Wave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\src\Wave.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

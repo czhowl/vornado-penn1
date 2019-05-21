@@ -1,8 +1,8 @@
 #version 150
 
 uniform float		uTime;
+uniform sampler2D	uTexRipple;
 uniform float		uAmplitude;
-uniform float		uMouse;
 
 in vec2 vTexCoord0;
 
@@ -30,6 +30,12 @@ float cubicPulse( float c, float w, float x )
     x /= w;
     return pow(1.0 - x*x*(3.0-2.0*x), 5);
 }
+#define M_PI 3.14159265358979323846
+float sinc( float x, float c, float k )
+{
+    float a = M_PI*(k*x-c);
+    return sin(a)/a;
+}
 
 float wave( float period )
 {
@@ -37,7 +43,7 @@ float wave( float period )
 }
 
 // calculate displacement based on uv coordinate
-float displace( vec2 uv )
+float displace( vec2 uv)
 {
 	// large up and down movement
 	float d = wave( (uv.x * 0.1) - uTime * 0.01 );
@@ -57,13 +63,8 @@ float displace( vec2 uv )
 
 void main()
 {
-	float d = uAmplitude * displace( vTexCoord0.xy );
-
-	float p = uMouse;
-
-	float y = cubicPulse(p, 0.08, vTexCoord0.x) * 30;
-
-	d += y;
-
+	float ripple = texture( uTexRipple, vTexCoord0.xy ).r;
+	float d = uAmplitude * displace( vTexCoord0.xy);
+	d += ripple;
 	oColor = vec4( d, d, d, 1.0 );
 }
