@@ -48,8 +48,8 @@ void VideoASCIIApp::setup()
 	//for (char c : mDisplay) {
 	//	console() << c << endl;
 	//}
-	//mCap = VideoCapture("../assets/kda.mp4");
-	mCap = VideoCapture(0);
+	mCap = VideoCapture("../assets/kda.mp4");
+	//mCap = VideoCapture(0);
 	if (!mCap.isOpened()) {
 		cout << "Error opening video stream or file" << endl;
 	}
