@@ -56,8 +56,8 @@ void main()
 	vec3 Nfinal = ciNormalMatrix * normalize( vertNormal + Nmap - Ndirection );
 
 	// perform some falloff magic
-	float falloff = sin( max( dot( Nfinal, vec3(0.15, 0.15, 1.0) ), 0.0) * 2.25);	
-	float alpha = 0.01 + 0.3 * pow( falloff, 30.0 );
+	float falloff = sin( max( dot( Nfinal, vec3(0.2, 0.2, 1.0) ), 0.0) * 2.25);	
+	float alpha = 0.01 + 0.5 * pow( falloff, 30.0 );
 	float r =  Nfinal.x * 5;
 	float g = Nfinal.z;
 	float b = Nfinal.y;

@@ -13,7 +13,7 @@ using namespace std;
 #define VERTEXNUM 100
 #define MAPNUM 800
 
-#define WAVENUM 5
+#define WAVENUM 1
 
 class displacementMapApp : public App {
 public:
@@ -62,7 +62,7 @@ void displacementMapApp::setup()
 	//getWindow()->setSize(bound / 1);
 
 	mMockUp = false;
-
+	mAmplitudeTarget = 10.0f;
 	// Camera
 	const vec2 windowSize = toPixels(getWindowSize());
 	mCamera = CameraPersp(windowSize.x, windowSize.y, 10.0f, 0.01f, 10000.0f);
@@ -91,6 +91,7 @@ void displacementMapApp::update()
 {
 	for (int i = 0; i < WAVENUM; i++) {
 		mWave[i]->update();
+		mWave[i]->mAmplitudeTarget = mAmplitudeTarget;
 	}
 }
 

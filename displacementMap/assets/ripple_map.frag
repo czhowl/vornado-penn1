@@ -47,11 +47,11 @@ void main()
 
 	float y = cubicPulse(p, 0.08, vTexCoord0.x) * 300;
 
-	float a = M_PI*( 20  * (vTexCoord0.x - p));
+	float a = M_PI*( 50  * (vTexCoord0.x - p));
 	y = sin(a) / a * 10;
 	
 	if(uRipple == 1){
-		target = clamp(y, -10.0f, 10.0f);
+		target = clamp(pow(y, 2), -10.0f, 10.0f);
 	}
 //	float s = 1.0;
 //	if(displacement > target){
@@ -61,6 +61,7 @@ void main()
 	displacement += (target - displacement) / 10;
 
 
-	target *= 0.99;
+	target *= 0.98;
+	//target -= target*target * 0.1;
 	oColor = vec4( displacement, target, displacement, 1.0 );
 }

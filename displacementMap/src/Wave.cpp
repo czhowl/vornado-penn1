@@ -18,7 +18,7 @@ void Wave::createMesh()
 	// create vertex, normal and texcoord buffers
 	const int  RES_X = 600;
 	const int  RES_Z = VERTEXNUM;
-	const vec3 size = vec3(1000.0f, 1.0f, 300.0f);
+	const vec3 size = vec3(1000.0f, 1.0f, 560.0f);
 
 	std::vector<vec3> positions(RES_X * RES_Z);
 	std::vector<vec3> normals(RES_X * RES_Z);

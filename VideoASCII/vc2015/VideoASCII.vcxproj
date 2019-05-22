@@ -1,0 +1,140 @@
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{20528859-679C-405B-85E9-AD08A4A02250}</ProjectGuid>
+    <RootNamespace>VideoASCII</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include;..\..\..\Cinder\include;..\blocks\WMFVideo\src;C:\lib\opencv\build\install\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>"..\..\..\Cinder\include";..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>cinder.lib;OpenGL32.lib;opencv_core410d.lib;opencv_video410d.lib;opencv_videoio410d.lib;opencv_videostab410d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Cinder\lib\msw\$(PlatformTarget);..\..\..\Cinder\lib\msw\$(PlatformTarget)\$(Configuration)\$(PlatformToolset);C:\lib\opencv\build\install\x64\vc15\lib</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCPMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\include;..\..\..\Cinder\include;..\blocks\WMFVideo\src;C:\lib\opencv\build\install\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>"..\..\..\Cinder\include";..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>cinder.lib;OpenGL32.lib;opencv_core410.lib;opencv_video410.lib;opencv_videoio410.lib;opencv_videostab410.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Cinder\lib\msw\$(PlatformTarget);..\..\..\Cinder\lib\msw\$(PlatformTarget)\$(Configuration)\$(PlatformToolset);C:\lib\opencv\build\install\x64\vc15\lib</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding />
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources.rc" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <ClCompile Include="..\src\VideoASCIIApp.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\ciWMFVideoPlayer.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\ciWMFVideoPlayerUtils.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\presenter\PresentEngine.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\presenter\Presenter.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\presenter\PresenterHelpers.cpp" />
+    <ClCompile Include="..\blocks\WMFVideo\src\presenter\scheduler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\ciWMFVideoPlayer.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\ciWMFVideoPlayerUtils.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\EVRPresenter.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\EVRPresenterUuid.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\PresentEngine.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\Presenter.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\PresenterHelpers.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\scheduler.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\AsyncCB.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\BufferLock.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\ClassFactory.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\common.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\critsec.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\GrowArray.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\linklist.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\logging.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\logmediatype.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\mediatype.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\mfutils.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\PropVar.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\registry.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\TinyMap.h" />
+    <ClInclude Include="..\blocks\WMFVideo\src\presenter\common\trace.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

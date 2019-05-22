@@ -55,7 +55,7 @@ float displace( vec2 uv)
 	d += 0.25 * wave( (uv.y * 1.2) - uTime * 0.01 );
 	d -= 0.15 * wave( ((uv.y + uv.x) * 2.8) - uTime * 0.09 );
 	d += 0.15 * wave( ((uv.y - uv.x) * 1.9) - uTime * 0.08 );
-	d += noise(vec2(uTime * 0.01, uv.x * 10));
+	//d += noise(vec2(uTime * 0.01, uv.x * 10)) * 10;
 	d += noise(vec2(uTime * 0.01 - 100, uv.y * 10));
 
 	return d;
