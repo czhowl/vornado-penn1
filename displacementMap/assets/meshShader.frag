@@ -57,11 +57,11 @@ void main()
 
 	// perform some falloff magic
 	float falloff = sin( max( dot( Nfinal, vec3(0.2, 0.2, 1.0) ), 0.0) * 2.25);	
-	float alpha = 0.01 + 0.5 * pow( falloff, 30.0 );
-	float r =  Nfinal.x * 5;
-	float g = Nfinal.z;
-	float b = Nfinal.y;
+	float alpha = 0+ 0.5 * pow( falloff, 30.0 );
+	float r = Nmap.x * 1.3 - 0.2 ;
+	float g = 0.4 + Nmap.z;
+	float b = 1.0 /falloff - Nmap.z;
 
 	// output color
-	oColor = vec4( 1,1,1 , alpha );
+	oColor = vec4( 1.0,0.9,0.6 , alpha );
 }

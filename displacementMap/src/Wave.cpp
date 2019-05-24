@@ -6,7 +6,7 @@ using namespace std;
 // ====================================================================== Wave
 
 #define VERTEXNUM 100
-#define MAPNUM 800
+#define MAPNUM 256
 
 Wave::Wave()
 { }
@@ -16,9 +16,9 @@ Wave::Wave()
 void Wave::createMesh()
 {
 	// create vertex, normal and texcoord buffers
-	const int  RES_X = 600;
-	const int  RES_Z = VERTEXNUM;
-	const vec3 size = vec3(1000.0f, 1.0f, 560.0f);
+	const int  RES_X = 400;
+	const int  RES_Z = 100;
+	const vec3 size = vec3(1100.0f, 1.0f, 560.0f);
 
 	std::vector<vec3> positions(RES_X * RES_Z);
 	std::vector<vec3> normals(RES_X * RES_Z);
@@ -81,7 +81,7 @@ void Wave::setup(float offset)
 	fmt.enableDepthBuffer(false);
 
 	// use a single channel (red) for the displacement map
-	fmt.setColorTextureFormat(gl::Texture2d::Format().wrap(GL_CLAMP_TO_EDGE).internalFormat(GL_R32F));
+	fmt.setColorTextureFormat(gl::Texture2d::Format().wrap(GL_CLAMP_TO_EDGE).internalFormat(GL_RG32F));
 	mDispMapFbo = gl::Fbo::create(MAPNUM, MAPNUM, fmt);
 	fmt.setColorTextureFormat(gl::Texture2d::Format().wrap(GL_CLAMP_TO_EDGE).internalFormat(GL_RG32F));
 	mRippleMapFbo = gl::Fbo::create(MAPNUM, MAPNUM, fmt);
@@ -93,6 +93,8 @@ void Wave::setup(float offset)
 	createMesh();
 
 	mTimeOffset = Rand::randFloat(-1000.0f, 1000.0f);
+
+	mDumping = 0.0f;
 }
 
 // ===================================================================== Update
@@ -168,14 +170,28 @@ void Wave::renderDisplacementMap()
 		gl::setMatricesWindow(mDispMapFbo->getSize());
 
 		// clear the color buffer
-		gl::clear();
+		//gl::clear();
 
 		// render the displacement map
 		gl::ScopedTextureBind tex0(mRippleMapFbo->getColorTexture());
+		gl::ScopedTextureBind tex1(mRippleMapFbo->getColorTexture());
 		gl::ScopedGlslProg shader(mDispMapShader);
 		mRippleMapShader->uniform("uTexRipple", 0);
+		mRippleMapShader->uniform("uTexDisp", 1);
 		mDispMapShader->uniform("uTime", float(getElapsedSeconds() + mTimeOffset));
 		mDispMapShader->uniform("uAmplitude", mAmplitude);
+
+		vec2 mousePos = getWindow()->getMousePos();
+		mDispMapShader->uniform("uMouse", float(mousePos.x / getWindowWidth()));
+		if (mPrevMouse.x != mousePos.x) {
+			mDumping += mRippleAmplitude * 0.5f;
+		}
+		mDumping = clamp(mDumping, 0.0f, 20.0f);
+		mDispMapShader->uniform("uDumping", mDumping);
+		mDumping *= 0.99f;
+		//console() << mDumping << endl;
+		mDispMapShader->uniform("uRippleAmplitude", mRippleAmplitude);
+
 		gl::drawSolidRect(mDispMapFbo->getBounds());
 
 		// clean up after ourselves
@@ -200,7 +216,8 @@ void Wave::renderRippleMap() {
 
 		gl::ScopedGlslProg shader(mRippleMapShader);
 		mRippleMapShader->uniform("uTexDisplacement", 0);
-		mRippleMapShader->uniform("uTime", float(getElapsedSeconds() + mTimeOffset));
+		mRippleMapShader->uniform("uTime", float(getElapsedSeconds() + mRippleAmplitude));
+		mRippleMapShader->uniform("uAmplitude", mRippleAmplitude);
 		vec2 mousePos = getWindow()->getMousePos();
 		mRippleMapShader->uniform("uMouse", float(mousePos.x / getWindowWidth()));
 		if (mPrevMouse.x != mousePos.x) {
@@ -209,6 +226,7 @@ void Wave::renderRippleMap() {
 		else {
 			mRippleMapShader->uniform("uRipple", int(0));
 		}
+		
 		gl::drawSolidRect(mRippleMapFbo->getBounds());
 
 		// clean up after ourselves

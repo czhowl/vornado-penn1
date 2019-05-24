@@ -81,5 +81,5 @@ void main() {
 
 
 	oColor = vec4(color,1.0);
-	oColor = vec4(0.0);
+	oColor = vec4(1.0);
 }

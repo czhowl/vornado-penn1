@@ -31,6 +31,7 @@ public:
 	ci::gl::FboRef				mDispMapFbo;
 	ci::gl::FboRef				mRippleMapFbo;
 	ci::gl::FboRef				mNormalMapFbo;
+	float						mRippleAmplitude;
 private:
 	ci::gl::GlslProgRef			mMeshShader;
 	ci::gl::VboMeshRef			mVboMesh;
@@ -46,4 +47,5 @@ private:
 	float					mOffset;
 	float					mTimeOffset;
 	glm::vec2				mPrevMouse;
+	float					mDumping;
 };

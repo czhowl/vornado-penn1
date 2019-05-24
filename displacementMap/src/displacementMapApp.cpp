@@ -13,7 +13,7 @@ using namespace std;
 #define VERTEXNUM 100
 #define MAPNUM 800
 
-#define WAVENUM 1
+#define WAVENUM 10
 
 class displacementMapApp : public App {
 public:
@@ -50,7 +50,8 @@ private:
 void displacementMapApp::setup()
 {
 	for (int i = 0; i < WAVENUM; i++) {
-		mWave[i] = Wave::create(i * 100.0f - 250.0f);
+		mWave[i] = Wave::create(i * 30.0f - 250.0f);
+		mWave[i]->mRippleAmplitude = 1 - i * 0.1;
 	}
 	
 
@@ -62,12 +63,12 @@ void displacementMapApp::setup()
 	//getWindow()->setSize(bound / 1);
 
 	mMockUp = false;
-	mAmplitudeTarget = 10.0f;
+	mAmplitudeTarget = 20.0f;
 	// Camera
 	const vec2 windowSize = toPixels(getWindowSize());
-	mCamera = CameraPersp(windowSize.x, windowSize.y, 10.0f, 0.01f, 10000.0f);
+	mCamera = CameraPersp(windowSize.x, windowSize.y, 10.0f, 0.01f, 50000.0f);
 	mCameraO = CameraOrtho(0, windowSize.x, windowSize.y, 0, 0.01f, 10000.0f);
-	mCamera.lookAt(vec3(0.0f, 200.0f, 2000.0f), vec3(0.0f, 0.0f, 0.0f));
+	mCamera.lookAt(vec3(-63.445f, 8432.912f, 29803.748f), vec3(0.0f, 0.0f, 0.0f));
 	mCameraO.lookAt(vec3(0.0f, 0.0f, 80.0f), vec3(0.0f, 0.0f, 0.0f));
 	mCamUi = CameraUi(&mCamera, getWindow(), -1);
 	mTime = 0;
@@ -78,7 +79,7 @@ void displacementMapApp::setup()
 	mParams->addParam("bg", &mTime).max(100.0).min(0.0).step(0.01f);
 	mParams->addParam("flt", &mTime2).max(10.0).min(0.0).step(0.01f);
 	mParams->addParam("draw texture", &mDrawTexture);
-	mFov = 11;
+	mFov = 1;
 	mCamera.setFov(mFov);
 	mParams->addParam("FOV", &mFov).max(100.0).min(0.0).step(1.0f).updateFn([&]() { mCamera.setFov(mFov); });
 }
@@ -91,8 +92,10 @@ void displacementMapApp::update()
 {
 	for (int i = 0; i < WAVENUM; i++) {
 		mWave[i]->update();
-		mWave[i]->mAmplitudeTarget = mAmplitudeTarget;
+		mWave[i]->mAmplitudeTarget = mAmplitudeTarget * (1 - i * 0.1);
 	}
+
+	//console() << mCamera.getViewDirection << "    " << mCamera.getEyePoint() << endl;
 }
 
 void displacementMapApp::draw()
@@ -129,6 +132,8 @@ void displacementMapApp::draw()
 	}
 
 	mParams->draw();
+
+	//console() << mCamera.getEyePoint() << endl;
 }
 
 void displacementMapApp::keyDown(KeyEvent event)

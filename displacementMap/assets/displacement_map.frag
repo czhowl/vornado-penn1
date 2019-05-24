@@ -4,6 +4,12 @@ uniform float		uTime;
 uniform sampler2D	uTexRipple;
 uniform float		uAmplitude;
 
+
+uniform sampler2D	uTexDisp;
+uniform float		uMouse;
+uniform float		uRippleAmplitude;
+uniform float		uDumping;
+
 in vec2 vTexCoord0;
 
 out vec4 oColor;
@@ -46,15 +52,15 @@ float wave( float period )
 float displace( vec2 uv)
 {
 	// large up and down movement
-	float d = wave( (uv.x * 0.1) - uTime * 0.01 );
+	float d = wave( (uv.x * 2.1) - uTime * 0.01 );
 	// add a large wave from left to right
-	d -= 1.2 * wave( (uv.x * 0.9) - uTime * 0.04 );
+	d -= 1.2 * wave( (uv.x * 1.9) - uTime * 0.04 );
 	// add diagonal waves from back to front
 	d -= 0.25 * wave( ((uv.x + uv.y) * 2.2) - uTime * 0.05 );
 	// add additional waves for increased complexity
-	d += 0.25 * wave( (uv.y * 1.2) - uTime * 0.01 );
+	d += 0.25 * wave( (uv.y * 3.2) - uTime * 0.01 );
 	d -= 0.15 * wave( ((uv.y + uv.x) * 2.8) - uTime * 0.09 );
-	d += 0.15 * wave( ((uv.y - uv.x) * 1.9) - uTime * 0.08 );
+	d += 0.15 * wave( ((uv.y - uv.x) * 1.9) - uTime * 0.4 );
 	//d += noise(vec2(uTime * 0.01, uv.x * 10)) * 10;
 	d += noise(vec2(uTime * 0.01 - 100, uv.y * 10));
 
@@ -66,5 +72,15 @@ void main()
 	float ripple = texture( uTexRipple, vTexCoord0.xy ).r;
 	float d = uAmplitude * displace( vTexCoord0.xy);
 	d += ripple;
-	oColor = vec4( d, d, d, 1.0 );
+
+
+	float pos = texture( uTexDisp, vTexCoord0.xy ).r;
+	float p = vTexCoord0.x -uMouse;
+	float a =  M_PI*( 100  * p) * uRippleAmplitude;
+	float y = sin(a) / a * 5;
+	float target = pow(y, 2) * (cos(sin(uTime * 2)) *sin(uDumping - pow(abs(p), 0.4))) * uRippleAmplitude;
+	pos += (target - pos) / 8;
+	d += pos;
+
+	oColor = vec4( d, pos, d, 1.0 );
 }

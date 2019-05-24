@@ -2,6 +2,7 @@
 
 uniform float		uTime;
 uniform float		uMouse;
+uniform float		uAmplitude;
 uniform int			uRipple;
 uniform sampler2D	uTexDisplacement;
 
@@ -38,30 +39,60 @@ float sinc( float x, float c, float k )
     return sin(a)/a;
 }
 
+//void main()
+//{
+//	float displacement = texture( uTexDisplacement, vTexCoord0.xy ).r;
+//	float dumping1 = texture( uTexDisplacement, vTexCoord0.xy ).g;
+//
+//
+//	float p = vTexCoord0.x -uMouse;
+//	if(uRipple == 1){
+//		dumping1 += uAmplitude * 0.3;
+//	}
+//	dumping1 = clamp(dumping1, 0, 20);
+//
+//	float y = 0;// = cubicPulse(p, 0.08, vTexCoord0.x) * 300;
+//
+//	float a = ( 100  * p);
+//	y = exp(-pow(a, 2)) * 5;
+//
+//	float target = clamp(pow(y, 2) * (cos(sin(uTime * 2)) *sin(dumping1 - pow(abs(p), 0.4))) * uAmplitude, -10.0f, 10.0f);
+//	dumping1 *= 0.99;
+//
+//	displacement += (target - displacement) / 8;
+//
+//	oColor = vec4( displacement, dumping1, 0.0, 1.0 );
+//}
+//
 void main()
 {
 	float displacement = texture( uTexDisplacement, vTexCoord0.xy ).r;
-	float target = texture( uTexDisplacement, vTexCoord0.xy ).g;
-
-	float p = uMouse;
-
-	float y = cubicPulse(p, 0.08, vTexCoord0.x) * 300;
-
-	float a = M_PI*( 50  * (vTexCoord0.x - p));
-	y = sin(a) / a * 10;
+	float p = vTexCoord0.x - uMouse;
+	float target =  texture( uTexDisplacement, vTexCoord0.xy ).g;
 	
+
 	if(uRipple == 1){
-		target = clamp(pow(y, 2), -10.0f, 10.0f);
+		target += exp(-pow(p * 20, 2)) * 10;
+		//dumping += uAmplitude * 0.3;
 	}
-//	float s = 1.0;
-//	if(displacement > target){
-//		s = -1.0;
-//	}
+
+	//dumping = clamp(dumping, 0, 20);
 	
-	displacement += (target - displacement) / 10;
+	vec2 e = vec2( 50.0 / 256.0 , 0);
+	float d1 = texture( uTexDisplacement, vTexCoord0.xy - e.xy ).r;
+	float d2 = texture( uTexDisplacement, vTexCoord0.xy + e.xy ).r;
 
+	target += (d2 + d1) * 0.1 - (displacement - 0.5) * 0.4;
 
-	target *= 0.98;
-	//target -= target*target * 0.1;
-	oColor = vec4( displacement, target, displacement, 1.0 );
+	float a = ( 100  * p);
+	float y = exp(-pow(a, 2)) * 5;
+	//target += clamp(pow(y, 2) * (cos(sin(uTime * 2)) *sin(dumping - pow(abs(p), 0.4))) * uAmplitude, -10.0f, 10.0f);
+	//dumping *= 0.99;
+	//displacement *= 0.8;
+//	displacement = 0.0;
+//	target = 0.0;
+	//target = clamp(target, -50.0, 50.0);
+	displacement += (target - displacement) / 50;
+	target *= 0.998;
+	oColor = vec4( displacement, target, 1.0, 1.0 );
 }
