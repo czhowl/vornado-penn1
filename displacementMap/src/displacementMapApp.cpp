@@ -63,7 +63,7 @@ void displacementMapApp::setup()
 	//getWindow()->setSize(bound / 1);
 
 	mMockUp = false;
-	mAmplitudeTarget = 20.0f;
+	mAmplitudeTarget = 60.0f;
 	// Camera
 	const vec2 windowSize = toPixels(getWindowSize());
 	mCamera = CameraPersp(windowSize.x, windowSize.y, 10.0f, 0.01f, 50000.0f);
@@ -79,9 +79,11 @@ void displacementMapApp::setup()
 	mParams->addParam("bg", &mTime).max(100.0).min(0.0).step(0.01f);
 	mParams->addParam("flt", &mTime2).max(10.0).min(0.0).step(0.01f);
 	mParams->addParam("draw texture", &mDrawTexture);
-	mFov = 1;
+	mFov = 2;
 	mCamera.setFov(mFov);
 	mParams->addParam("FOV", &mFov).max(100.0).min(0.0).step(1.0f).updateFn([&]() { mCamera.setFov(mFov); });
+
+	mBackgroundShader = gl::GlslProg::create(loadAsset("backgroundShader.vert"), loadAsset("backgroundShader.frag"));
 }
 
 void displacementMapApp::mouseDown( MouseEvent event )
@@ -92,7 +94,7 @@ void displacementMapApp::update()
 {
 	for (int i = 0; i < WAVENUM; i++) {
 		mWave[i]->update();
-		mWave[i]->mAmplitudeTarget = mAmplitudeTarget * (1 - i * 0.1);
+		mWave[i]->mAmplitudeTarget = mAmplitudeTarget * (1 - i * 0.08);
 	}
 
 	//console() << mCamera.getViewDirection << "    " << mCamera.getEyePoint() << endl;
@@ -104,16 +106,16 @@ void displacementMapApp::draw()
 
 	float t = mTime;
 
-	//if (true) {
-	//	gl::ScopedGlslProg    scpProg(mBackgroundShader);
-	//	mBackgroundShader->uniform("uResolution", vec2(getWindowWidth(), getWindowHeight()));
-	//	vec2 mousePos = getWindow()->getMousePos();
-	//	//console() << mousePos.x / getWindowWidth() << endl;
-	//	mBackgroundShader->uniform("uMouse", vec2(float(mousePos.x), float(mousePos.y)));
-	//	mBackgroundShader->uniform("uTime", t);
-	//	Rectf	window = getWindowBounds();
-	//	gl::drawSolidRect(Rectf(0.0, 0.0, getWindowWidth(), getWindowHeight()));
-	//}
+	if (true) {
+		gl::ScopedGlslProg    scpProg(mBackgroundShader);
+		mBackgroundShader->uniform("uResolution", vec2(getWindowWidth(), getWindowHeight()));
+		vec2 mousePos = getWindow()->getMousePos();
+		//console() << mousePos.x / getWindowWidth() << endl;
+		mBackgroundShader->uniform("uMouse", vec2(float(mousePos.x), float(mousePos.y)));
+		mBackgroundShader->uniform("uTime", t);
+		Rectf	window = getWindowBounds();
+		gl::drawSolidRect(Rectf(0.0, 0.0, getWindowWidth(), getWindowHeight()));
+	}
 
 	gl::pushMatrices();
 	gl::setMatrices(mCamera);
@@ -144,6 +146,7 @@ void displacementMapApp::keyDown(KeyEvent event)
 		for (int i = 0; i < WAVENUM; i++) {
 			mWave[i]->compileShaders();
 		}
+		mBackgroundShader = gl::GlslProg::create(loadAsset("backgroundShader.vert"), loadAsset("backgroundShader.frag"));
 		break;
 	case KeyEvent::KEY_m:
 		// reload shaders
@@ -154,7 +157,7 @@ void displacementMapApp::keyDown(KeyEvent event)
 
 void displacementMapApp::prepare(App::Settings *settings)
 {
-	settings->setWindowSize(1920, 1080);
+	settings->setWindowSize(768, 768);
 	//    settings->setFullScreen();
 }
 
