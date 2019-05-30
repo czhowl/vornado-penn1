@@ -60,9 +60,16 @@ class depthwaveApp : public App {
 	Surface16u sf;
 	gl::GlslProgRef			simpleShader;
 
-	vector<float>			depthArray;
+	vector<int>				depthArray;
 	vector<float>			prevDepthArray;
 
+	rs2::colorizer			color_map;
+	rs2::temporal_filter	temp_filter;
+	
+	float					far = 2.0;
+	float					alpha = 0.0f;
+	float					scale = 8.0f;
+	Mat						frame1, prvs;
 };
 
 void depthwaveApp::setup()
@@ -91,50 +98,51 @@ void depthwaveApp::setup()
 	mFov = 2;
 	mCamera.setFov(mFov);
 	mParams->addParam("FOV", &mFov).max(100.0).min(0.0).step(1.0f).updateFn([&]() { mCamera.setFov(mFov); });
-
+	mParams->addParam("far", &far).max(3.0).min(0.15).step(0.01f);
+	mParams->addParam("alpha", &alpha).max(1.0).min(0.0).step(0.01f);
+	mParams->addParam("scale", &scale).max(100.0).min(1.0).step(1.0f);
 	mBackgroundShader = gl::GlslProg::create(loadAsset("backgroundShader.vert"), loadAsset("backgroundShader.frag"));
 
 	simpleShader = gl::GlslProg::create(loadAsset("simple.vert"), loadAsset("simple.frag"));
 
 	
 
-	auto callback = [&](const rs2::frame& frame)
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-		if (rs2::frameset fs = frame.as<rs2::frameset>())
-		{
-			// With callbacks, all synchronized stream will arrive in a single frameset
-			/*for (const rs2::frame& f : fs)
-				counters[f.get_profile().unique_id()]++;*/
-			rs2::depth_frame mRSDepthFrame = fs.get_depth_frame();
-			data = (uint16_t *)mRSDepthFrame.get_data();
-			int width = mRSDepthFrame.get_width();
-			int height = mRSDepthFrame.get_height();
-			sf = Surface16u(data, width, height, 4 * width, SurfaceChannelOrder(GL_R16UI));
-			mRSDepthFrameReady = true;
-		}
-		else
-		{
-			// Stream that bypass synchronization (such as IMU) will produce single frames
-			//counters[frame.get_profile().unique_id()]++;
-		}
-	};
+	//auto callback = [&](const rs2::frame& frame)
+	//{
+	//	std::lock_guard<std::mutex> lock(mutex);
+	//	if (rs2::frameset fs = frame.as<rs2::frameset>())
+	//	{
+	//		// With callbacks, all synchronized stream will arrive in a single frameset
+	//		/*for (const rs2::frame& f : fs)
+	//			counters[f.get_profile().unique_id()]++;*/
+	//		rs2::depth_frame mRSDepthFrame = fs.get_depth_frame();
+	//		data = (uint16_t *)mRSDepthFrame.get_data();
+	//		int width = mRSDepthFrame.get_width();
+	//		int height = mRSDepthFrame.get_height();
+	//		sf = Surface16u(data, width, height, 4 * width, SurfaceChannelOrder(GL_R16UI));
+	//		mRSDepthFrameReady = true;
+	//	}
+	//	else
+	//	{
+	//		// Stream that bypass synchronization (such as IMU) will produce single frames
+	//		//counters[frame.get_profile().unique_id()]++;
+	//	}
+	//};
 
 	//rs2::pipeline_profile profile = realsense.start(callback);
 	rs2::config cfg;
 
 	//Add desired streams to configuration
-	cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
-	cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+	//cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
+	cfg.enable_stream(RS2_STREAM_DEPTH, 640, 360, RS2_FORMAT_Z16, 60);
 	rs2::pipeline_profile profile = realsense.start(cfg);
-
-	//sf = Surface16u(1280, 720, 4 * 720, SurfaceChannelOrder(GL_R16UI));
-
+	color_map = rs2::colorizer(2);
+	
 	depthArray.clear();
 	//mDepthTexture = gl::Texture::create(colorized_depth.get_data(), GL_RGB, width, height, gl::Texture::Format().loadTopDown());
-	for (int y = 40; y < 480; y += 100) {
-		for (int x = 20; x < 640; x += 100) {
-			depthArray.push_back(0.0f);
+	for (int y = 6; y < 48; y += 6) {
+		for (int x = 1; x < 80; x += 2) {
+			depthArray.push_back(0);
 			prevDepthArray.push_back(0.0f);
 		}
 	}
@@ -146,17 +154,31 @@ void depthwaveApp::mouseDown( MouseEvent event )
 
 void depthwaveApp::update()
 {
-	rs2::colorizer color_map(2);
+	
 
 	rs2::frameset fs = realsense.wait_for_frames();
-	rs2::depth_frame depth = fs.get_depth_frame();
-	rs2::frame color_frame = fs.get_color_frame();
-	auto colorized_depth = color_map.colorize(depth);
-	int width = depth.get_width();
-	int height = depth.get_height();
+	rs2::frame depth = fs.get_depth_frame();
+	rs2::frame filtered = depth;
+	rs2::decimation_filter  dec_filter;
+	dec_filter.set_option(RS2_OPTION_FILTER_MAGNITUDE, scale);
+	filtered = dec_filter.process(filtered);
+	rs2::threshold_filter thr_filter(0.15f, far);
+	filtered = thr_filter.process(filtered);
+	//rs2::frame color_frame = fs.get_color_frame();
+	//rs2::disparity_transform depth_to_disparity(true);
+	//rs2::disparity_transform disparity_to_depth(false);
+	//filtered = depth_to_disparity.process(filtered);
+	temp_filter.set_option(rs2_option::RS2_OPTION_FILTER_SMOOTH_DELTA, 100.0f);
+	temp_filter.set_option(rs2_option::RS2_OPTION_FILTER_SMOOTH_ALPHA, alpha);
+	filtered = temp_filter.process(filtered);
+	//filtered = disparity_to_depth.process(filtered);
+	auto colorized_depth = color_map.colorize(filtered);
+	int width = colorized_depth.get_width();
+	int height = colorized_depth.get_height();
+	//console() << width << " " << height << endl;
 	//uint16_t* data = (uint16_t*)depth.get_data();
 	
-	//Mat color(Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), Mat::AUTO_STEP);
+	Mat color(Size(640, 480), CV_8UC3, (void*)colorized_depth.get_data(), Mat::AUTO_STEP);
 	//mDepthTexture = gl::Texture::create((void *)color.data, GL_RGB, color.cols, color.rows, gl::Texture::Format().loadTopDown());
 
 	//Mat color(Size(640, 480), CV_16U, (void*)depth.get_data(), Mat::AUTO_STEP);
@@ -166,24 +188,31 @@ void depthwaveApp::update()
 	//mDepthTexture = gl::Texture::create((void *)color.data, GL_BGR, color.cols, color.rows, gl::Texture::Format().loadTopDown());
 
 	//depthArray.clear();
-	//mDepthTexture = gl::Texture::create(colorized_depth.get_data(), GL_RGB, width, height, gl::Texture::Format().loadTopDown());
+	//mDepthTexture = gl::Texture::create(colorized_depth.get_data(), GL_RGB, width, height);// , gl::Texture::Format().loadTopDown());
+	Surface sf = Surface((uint8_t *)colorized_depth.get_data(), width, height, 3 * width, SurfaceChannelOrder::RGB);
+	mDepthTexture = gl::Texture::create(sf);
+
 	int i = 0;
-	for (int y = 40; y < height; y += 100) {
-		for (int x = 20; x < width; x += 100) {
-			depthArray[i] = depth.get_distance(x, y);
-			if (abs(depthArray[i] - prevDepthArray[i]) > 1) {
-				depthArray[i] = 1.0;
+	for (int y = 6; y < 48; y += 6) {
+		for (int x = 1; x < 80; x += 2) {
+			float d = sf.getPixel(ivec2(x,y)).r;
+			
+			if (abs(d - prevDepthArray[i]) > 10) {
+				depthArray[i] = 1;
 			}
 			else {
-				depthArray[i] = 0.0;
+				depthArray[i] = 0;
 			}
-			//console() << prevDepthArray[i] << " ";
-			prevDepthArray[i] = depth.get_distance(x, y);
+			
+			prevDepthArray[i] = d;
+			//console() << depthArray[i] << "  ";
 			i++;
 		}
+		//console() << endl;;
+		
 	}
-	//console() << endl << endl;;
 	//console() << depthArray.size() << endl;
+	//console() << endl;;
 	
 
 
@@ -233,6 +262,10 @@ void depthwaveApp::draw()
 		gl::draw(mWave[0]->mRippleMapFbo->getColorTexture(), vec2(0));
 		gl::color(Color(1, 1, 1));
 		gl::draw(mWave[0]->mNormalMapFbo->getColorTexture(), vec2(MAPNUM + 1, 0));
+		gl::pushMatrices();
+		gl::scale(5.0f, 5.0f);
+		gl::draw(mDepthTexture, vec2(50, 0));
+		gl::popMatrices();
 	}
 
 	mParams->draw();
@@ -245,8 +278,7 @@ void depthwaveApp::draw()
 	//	Rectf	window = getWindowBounds();
 	//	gl::drawSolidRect(Rectf(0.0, 0.0, getWindowWidth(), getWindowHeight()));
 	//}
-	if (mDepthTexture) gl::draw(mDepthTexture);
-	//auto texture = gl::Texture2d::create(sf);
+;	//auto texture = gl::Texture2d::create(sf);
 	//gl::draw(texture);
 	
 	// load shader
@@ -264,6 +296,7 @@ void depthwaveApp::keyDown(KeyEvent event)
 			mWave[i]->compileShaders();
 		}
 		mBackgroundShader = gl::GlslProg::create(loadAsset("backgroundShader.vert"), loadAsset("backgroundShader.frag"));
+		getWindow()->setFullScreen(false);
 		break;
 	case KeyEvent::KEY_f:
 		getWindow()->setFullScreen();

@@ -19,13 +19,13 @@ public:
 	Wave();
 
 	void setup(float offset);
-	void update(std::vector<float> depthArray);
+	void update(std::vector<int> depthArray);
 	void draw();
 	void					compileShaders();
 	void					createMesh();
 	void					renderDisplacementMap();
 	void					renderNormalMap();
-	void					renderRippleMap(std::vector<float> depthArray);
+	void					renderRippleMap(std::vector<int> depthArray);
 	float					mAmplitudeTarget;
 
 	ci::gl::FboRef				mDispMapFbo;

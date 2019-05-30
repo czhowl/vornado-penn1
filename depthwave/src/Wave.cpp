@@ -99,7 +99,7 @@ void Wave::setup(float offset)
 
 // ===================================================================== Update
 
-void Wave::update(vector<float> depthArray)
+void Wave::update(vector<int> depthArray)
 {
 	mAmplitude += 0.02f * (mAmplitudeTarget - mAmplitude);
 
@@ -174,10 +174,10 @@ void Wave::renderDisplacementMap()
 
 		// render the displacement map
 		gl::ScopedTextureBind tex0(mRippleMapFbo->getColorTexture());
-		gl::ScopedTextureBind tex1(mRippleMapFbo->getColorTexture());
+		//gl::ScopedTextureBind tex1(mDispMapFbo->getColorTexture());
 		gl::ScopedGlslProg shader(mDispMapShader);
-		mRippleMapShader->uniform("uTexRipple", 0);
-		mRippleMapShader->uniform("uTexDisp", 1);
+		mDispMapShader->uniform("uTexRipple", 0);
+		//mDispMapShader->uniform("uTexDisp", 1);
 		mDispMapShader->uniform("uTime", float(getElapsedSeconds() + mTimeOffset));
 		mDispMapShader->uniform("uAmplitude", mAmplitude);
 
@@ -199,12 +199,8 @@ void Wave::renderDisplacementMap()
 	}
 }
 
-void Wave::renderRippleMap(vector<float> depthArray) {
+void Wave::renderRippleMap(vector<int> depthArray) {
 	if (mRippleMapShader && mRippleMapFbo) {
-		for (auto p : depthArray) {
-			console() << p << " ";
-		}
-		console() << endl;
 		// bind frame buffer
 		gl::ScopedFramebuffer fbo(mRippleMapFbo);
 
@@ -223,7 +219,7 @@ void Wave::renderRippleMap(vector<float> depthArray) {
 		//mRippleMapShader->uniform("uTexDisplacement", 0);
 		mRippleMapShader->uniform("uTime", float(getElapsedSeconds() + mRippleAmplitude));
 		mRippleMapShader->uniform("uAmplitude", mRippleAmplitude);
-		mRippleMapShader->uniform("uDepth", &(depthArray[0]), 35);
+		mRippleMapShader->uniform("uDepth", &(depthArray[0]), 280);
 		vec2 mousePos = getWindow()->getMousePos();
 		mRippleMapShader->uniform("uMouse", float(mousePos.x / getWindowWidth()));
 		if (mPrevMouse.x != mousePos.x) {

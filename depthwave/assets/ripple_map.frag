@@ -3,7 +3,7 @@
 uniform float		uTime;
 uniform float		uMouse;
 uniform float		uAmplitude;
-uniform float[35]	uDepth;
+uniform int[280]	uDepth;
 uniform int			uRipple;
 uniform sampler2D	uTexDisplacement;
 
@@ -11,34 +11,34 @@ in vec2 vTexCoord0;
 
 out vec4 oColor;
 
-float rand(vec2 n) { 
-	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-}
-
-float noise(vec2 p){
-	vec2 ip = floor(p);
-	vec2 u = fract(p);
-	u = u*u*(3.0-2.0*u);
-	
-	float res = mix(
-		mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
-		mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
-	return res*res;
-}
-
-float cubicPulse( float c, float w, float x )
-{
-    x = abs(x - c);
-    if( x>w ) return 0.0;
-    x /= w;
-    return pow(1.0 - x*x*(3.0-2.0*x), 5);
-}
-#define M_PI 3.14159265358979323846
-float sinc( float x, float c, float k )
-{
-    float a = M_PI*(k*x-c);
-    return sin(a)/a;
-}
+//float rand(vec2 n) { 
+//	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+//}
+//
+//float noise(vec2 p){
+//	vec2 ip = floor(p);
+//	vec2 u = fract(p);
+//	u = u*u*(3.0-2.0*u);
+//	
+//	float res = mix(
+//		mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
+//		mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
+//	return res*res;
+//}
+//
+//float cubicPulse( float c, float w, float x )
+//{
+//    x = abs(x - c);
+//    if( x>w ) return 0.0;
+//    x /= w;
+//    return pow(1.0 - x*x*(3.0-2.0*x), 5);
+//}
+//#define M_PI 3.14159265358979323846
+//float sinc( float x, float c, float k )
+//{
+//    float a = M_PI*(k*x-c);
+//    return sin(a)/a;
+//}
 
 //void main()
 //{
@@ -77,24 +77,28 @@ void main()
 	float target =  texture( uTexDisplacement, vTexCoord0.xy ).g;
 
 	int i = 0;
-	for (int y = 40; y < 480; y += 100) {
-		for (int x = 20; x < 640; x += 100) {
-			if(uDepth[i] == 1.0){
-				target += exp(-pow((vTexCoord0.x - x / 640.0) * 20, 2)) * 10;
-			}
+	for (int y = 6; y < 48; y += 6) {
+		for (int x = 1; x < 80; x += 2) {
+		//uDepth[i];
+			if(uDepth[i] == 1)
+				target += exp(-pow((vTexCoord0.x - x / 80.0) * 10, 2)) * 10;
+			
 			i++;
+			//if(i == 500) i = 499;
 		}
 	}
 
 
-//	if(uRipple == 1){
-//		target += exp(-pow(p * 20, 2)) * 10;
-//		//dumping += uAmplitude * 0.3;
-//	}
+
+
+	if(uRipple == 1){
+		target += exp(-pow(p * 20, 2)) * 10;
+		//dumping += uAmplitude * 0.3;
+	}
 
 	//dumping = clamp(dumping, 0, 20);
 	
-	vec2 e = vec2( 50.0 / 256.0 , 0);
+	vec2 e = vec2( 10.0 / 256.0 , 0);
 	float d1 = texture( uTexDisplacement, vTexCoord0.xy - e.xy ).r;
 	float d2 = texture( uTexDisplacement, vTexCoord0.xy + e.xy ).r;
 

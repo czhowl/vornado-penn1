@@ -5,7 +5,7 @@ uniform sampler2D	uTexRipple;
 uniform float		uAmplitude;
 
 
-uniform sampler2D	uTexDisp;
+//uniform sampler2D	uTexDisp;
 uniform float		uMouse;
 uniform float		uRippleAmplitude;
 uniform float		uDumping;
@@ -74,13 +74,13 @@ void main()
 	d += ripple;
 
 
-	float pos = texture( uTexDisp, vTexCoord0.xy ).r;
-	float p = vTexCoord0.x -uMouse;
-	float a =  M_PI*( 100  * p) * uRippleAmplitude;
-	float y = sin(a) / a * 5;
-	float target = pow(y, 2) * (cos(sin(uTime * 2)) *sin(uDumping - pow(abs(p), 0.4))) * uRippleAmplitude;
-	pos += (target - pos) / 8;
-	d += pos;
+//	float pos = texture( uTexDisp, vTexCoord0.xy ).r;
+//	float p = vTexCoord0.x -uMouse;
+//	float a =  M_PI*( 100  * p) * uRippleAmplitude;
+//	float y = sin(a) / a * 5;
+//	float target = pow(y, 2) * (cos(sin(uTime * 2)) *sin(uDumping - pow(abs(p), 0.4))) * uRippleAmplitude;
+//	pos += (target - pos) / 8;
+//	d += pos;
 
-	oColor = vec4( d, pos, d, 1.0 );
+	oColor = vec4( d, d, d, 1.0 );
 }

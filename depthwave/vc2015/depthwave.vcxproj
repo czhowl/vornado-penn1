@@ -58,7 +58,7 @@
       <AdditionalIncludeDirectories>"..\..\..\Cinder\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>cinder.lib;OpenGL32.lib;realsense2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cinder.lib;OpenGL32.lib;realsense2.lib;opencv_calib3d410d.lib;opencv_core410d.lib;opencv_features2d410d.lib;opencv_flann410d.lib;opencv_highgui410d.lib;opencv_imgcodecs410d.lib;opencv_imgproc410d.lib;opencv_ml410d.lib;opencv_objdetect410d.lib;opencv_photo410d.lib;opencv_shape410d.lib;opencv_stitching410d.lib;opencv_superres410d.lib;opencv_video410d.lib;opencv_videoio410d.lib;opencv_videostab410d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Cinder\lib\msw\$(PlatformTarget);..\..\..\Cinder\lib\msw\$(PlatformTarget)\$(Configuration)\$(PlatformToolset);C:\Program Files %28x86%29\Intel RealSense SDK 2.0\lib\x64;C:\lib\opencv\build\install\x64\vc15\lib</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
