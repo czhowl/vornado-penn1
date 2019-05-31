@@ -38,7 +38,17 @@ var oldCenter;
 var velocity;
 var gravity;
 var radius;
+var size = 0.01;
+var speed = 2;
 var paused = false;
+var r = 0.5;
+var g = 0.5;
+var b = 0.6;
+var sr = 10;
+var sg = 5;
+var sb = 0;
+var sunsize = 500.0;
+var strength = 0.01;
 
 window.onload = function() {
   var ratio = window.devicePixelRatio || 1;
@@ -83,7 +93,7 @@ window.onload = function() {
   radius = 0.25;
 
   for (var i = 0; i < 20; i++) {
-    water.addDrop(Math.random() * 2 - 1, Math.random() * 2 - 1, 0.03, (i & 1) ? 0.01 : -0.01);
+    water.addDrop(Math.random() * 2 - 1, Math.random() * 2 - 1, size, (i & 1) ? 0.01 : -0.01);
   }
 
   document.getElementById('loading').innerHTML = '';
@@ -136,9 +146,8 @@ window.onload = function() {
       case MODE_ADD_DROPS: {
         var tracer = new GL.Raytracer();
         var ray = tracer.getRayForPixel(x * ratio, y * ratio);
-        console.log(x * ratio + "   " + y);
         var pointOnPlane = tracer.eye.add(ray.multiply(-tracer.eye.y / ray.y));
-        water.addDrop(pointOnPlane.x, pointOnPlane.z, 0.03, 0.01);
+        water.addDrop(pointOnPlane.x, pointOnPlane.z, size, strength);
         if (paused) {
           water.updateNormals();
           renderer.updateCaustics(water);
@@ -199,9 +208,39 @@ window.onload = function() {
     }
   };
 
+  function changewaterColor(){
+    var color = document.getElementById("watercolor").value;
+    
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+    r = parseInt(result[1], 16) / 255.0;
+    g = parseInt(result[2], 16) / 255.0;
+    b = parseInt(result[3], 16) / 255.0;
+    draw();
+}
+
+  document.getElementById("watercolor").addEventListener("change", changewaterColor, false);
+  
+  function changeSunColor(){
+    var color = document.getElementById("suncolor").value;
+    
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+    sr = parseInt(result[1], 16) / 25.5;
+    sg = parseInt(result[2], 16) / 25.5;
+    sb = parseInt(result[3], 16) / 25.5;
+    draw();
+}
+
+  document.getElementById("suncolor").addEventListener("change", changeSunColor, false);
+
   document.onkeydown = function(e) {
     if (e.which == ' '.charCodeAt(0)) paused = !paused;
     else if (e.which == 'L'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'Q'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'W'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'Z'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'X'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'A'.charCodeAt(0) && paused) draw();
+    else if (e.which == 'S'.charCodeAt(0) && paused) draw();
   };
 
   var frame = 0;
@@ -214,8 +253,16 @@ window.onload = function() {
     oldCenter = center;
 
     // Update the water simulation and graphics
-    water.stepSimulation();
-    water.stepSimulation();
+    for(var i = 0; i < speed; i ++){
+      water.stepSimulation();
+    }
+
+    water.addDrop(Math.random() * 1.0 -0.5 , 1.0 , 0.1, 0.0002);
+    water.addDrop(Math.random() * 1.0 -0.5 , -1.0 , 0.1, 0.0002);
+    water.addDrop(1.0, Math.random() * 1.0 -0.5, 0.1, 0.0002);
+    water.addDrop(-1.0, Math.random() * 1.0 -0.5, 0.1, 0.0002);
+    //water.addDrop(Math.random() * 0.1 - 0.99,Math.random() * 0.1 - 0.99, 0.04, 0.0005);
+    //water.stepSimulation();
     water.updateNormals();
     renderer.updateCaustics(water);
   }
@@ -226,6 +273,39 @@ window.onload = function() {
       renderer.lightDir = GL.Vector.fromAngles((90 - angleY) * Math.PI / 180, -angleX * Math.PI / 180);
       if (paused) renderer.updateCaustics(water);
     //}
+    if (GL.keys.Q) {
+      size -= 0.001;
+      if(size < 0.001) size = 0.001; 
+    }
+    if (GL.keys.W) {
+      size += 0.001;
+    }
+    if (GL.keys.Z) {
+      speed -= 1;
+      if(speed < 1) speed = 1; 
+    }
+    if (GL.keys.X) {
+      speed += 1;
+      if(speed > 20) speed = 20; 
+    }
+
+    if (GL.keys.A) {
+      sunsize *= 2;
+      if(sunsize > 5000000) sunsize = 500000; 
+    }
+    if (GL.keys.S) {
+      sunsize /= 2;
+      if(sunsize < 0.05) sunsize = 0.05; 
+    }
+
+    if (GL.keys.N) {
+      strength -= 0.001;
+      if(strength < 0.001) strength = 0.001; 
+    }
+    if (GL.keys.M) {
+      strength += 0.05;
+      if(strength >0.05) strength = 0.05; 
+    }
 
     // angleX = -90;
     // angleY = 0;
@@ -242,7 +322,7 @@ window.onload = function() {
     renderer.sphereCenter = center;
     renderer.sphereRadius = radius;
     //renderer.renderCube();
-    renderer.renderWater(water, cubemap);
+    renderer.renderWater(water, cubemap, new GL.Vector(r, g,b), new GL.Vector(sr, sg,sb), sunsize);
     //renderer.renderSphere();
     gl.disable(gl.DEPTH_TEST);
   }

@@ -20,8 +20,8 @@ function Water() {
     throw new Error('This demo requires the OES_texture_float extension');
   }
   var filter = GL.Texture.canUseFloatingPointLinearFiltering() ? gl.LINEAR : gl.NEAREST;
-  this.textureA = new GL.Texture(800, 800, { type: gl.FLOAT, filter: filter });
-  this.textureB = new GL.Texture(800, 800, { type: gl.FLOAT, filter: filter });
+  this.textureA = new GL.Texture(1000, 1000, { type: gl.FLOAT, filter: filter });
+  this.textureB = new GL.Texture(1000, 1000, { type: gl.FLOAT, filter: filter });
   this.dropShader = new GL.Shader(vertexShader, '\
     const float PI = 3.141592653589793;\
     uniform sampler2D texture;\
@@ -118,7 +118,7 @@ Water.prototype.updateNormals = function() {
   this.textureB.drawTo(function() {
     this_.textureA.bind();
     this_.normalShader.uniforms({
-      delta: [1 / this_.textureA.width, 1 / this_.textureA.height]
+      delta: [0.1 / this_.textureA.width, 0.1 / this_.textureA.height]
     }).draw(this_.plane);
   });
   this.textureB.swapWith(this.textureA);

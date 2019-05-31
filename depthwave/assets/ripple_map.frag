@@ -81,7 +81,7 @@ void main()
 		for (int x = 1; x < 80; x += 2) {
 		//uDepth[i];
 			if(uDepth[i] == 1)
-				target += exp(-pow((vTexCoord0.x - x / 80.0) * 10, 2)) * 10;
+				target += exp(-pow((vTexCoord0.x - x / 80.0) * 40, 2)) * 10;
 			
 			i++;
 			//if(i == 500) i = 499;
@@ -92,13 +92,13 @@ void main()
 
 
 	if(uRipple == 1){
-		target += exp(-pow(p * 20, 2)) * 10;
+		target += exp(-pow(p * 40, 2)) * 10;
 		//dumping += uAmplitude * 0.3;
 	}
 
 	//dumping = clamp(dumping, 0, 20);
 	
-	vec2 e = vec2( 10.0 / 256.0 , 0);
+	vec2 e = vec2( 50.0 / 500.0 , 0);
 	float d1 = texture( uTexDisplacement, vTexCoord0.xy - e.xy ).r;
 	float d2 = texture( uTexDisplacement, vTexCoord0.xy + e.xy ).r;
 
@@ -113,6 +113,6 @@ void main()
 //	target = 0.0;
 	//target = clamp(target, -50.0, 50.0);
 	displacement += (target - displacement) / 50;
-	target *= 0.998;
+	target *= 1-1e-6;
 	oColor = vec4( displacement, target, 1.0, 1.0 );
 }

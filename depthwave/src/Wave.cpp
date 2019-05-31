@@ -6,7 +6,7 @@ using namespace std;
 // ====================================================================== Wave
 
 #define VERTEXNUM 100
-#define MAPNUM 256
+#define MAPNUM 500
 
 Wave::Wave()
 { }
@@ -16,7 +16,7 @@ Wave::Wave()
 void Wave::createMesh()
 {
 	// create vertex, normal and texcoord buffers
-	const int  RES_X = 400;
+	const int  RES_X = 500;
 	const int  RES_Z = 100;
 	const vec3 size = vec3(1100.0f, 1.0f, 560.0f);
 

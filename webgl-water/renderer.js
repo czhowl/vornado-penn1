@@ -48,6 +48,7 @@ var helperFunctions = '\
       scale += diffuse * 0.5;\
     \
     return wallColor * scale;\
+    /*return vec3(1.0) * scale;*/\
   }\
 ';
 
@@ -77,10 +78,12 @@ function Renderer() {
       uniform vec3 eye;\
       varying vec3 position;\
       uniform samplerCube sky;\
+      uniform vec3 watercolor;\
+      uniform vec3 suncolor;\
+      uniform float sunsize;\
       \
-      vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor) {\
+      vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor, vec3 suncolor, float sunsize) {\
         vec3 color;\
-        float q = 1.0e6;\
         if (ray.y < 0.0) {\
           vec2 t = intersectCube(origin, ray, vec3(-5.0, -poolHeight, -2.0), vec3(5.0, 2.0, 2.0));\
           color = getWallColor(origin + ray * t.y);\
@@ -91,7 +94,7 @@ function Renderer() {
             color = getWallColor(hit);\
           } else {\
             color = textureCube(sky, ray).rgb;\
-            color += vec3(pow(max(0.0, dot(light, ray)), 5000.0)) * vec3(10.0, 8.0, 6.0);\
+            color += vec3(pow(max(0.0, dot(light, ray)), sunsize)) * suncolor;\
           }\
         }\
         if (ray.y < 0.0) color *= waterColor;\
@@ -120,9 +123,9 @@ function Renderer() {
           vec3 refractedRay = refract(incomingRay, normal, IOR_AIR / IOR_WATER);\
           float fresnel = mix(0.25, 1.0, pow(1.0 - dot(normal, -incomingRay), 3.0));\
           \
-          vec3 abovewaterColor = vec3(0.3 - position.z);\
-          vec3 reflectedColor = getSurfaceRayColor(position, reflectedRay, abovewaterColor);\
-          vec3 refractedColor = getSurfaceRayColor(position, refractedRay, abovewaterColor);\
+          vec3 abovewaterColor = watercolor;\
+          vec3 reflectedColor = getSurfaceRayColor(position, reflectedRay, abovewaterColor, suncolor, sunsize);\
+          vec3 refractedColor = getSurfaceRayColor(position, refractedRay, abovewaterColor, suncolor, sunsize);\
           \
           gl_FragColor = vec4(mix(refractedColor, reflectedColor, fresnel), 1.0);\
         ' + '\
@@ -202,7 +205,7 @@ Renderer.prototype.updateCaustics = function(water) {
   });
 };
 
-Renderer.prototype.renderWater = function(water, sky) {
+Renderer.prototype.renderWater = function(water, sky, color, suncolor, sunsize) {
   var tracer = new GL.Raytracer();
   water.textureA.bind(0);
   this.tileTexture.bind(1);
@@ -218,7 +221,10 @@ Renderer.prototype.renderWater = function(water, sky) {
       sky: 2,
       causticTex: 3,
       eye: tracer.eye,
-      poolHeight: 0.5
+      poolHeight: 0.5,
+      watercolor: color,
+      suncolor: suncolor,
+      sunsize: sunsize
     }).draw(this.waterMesh);
   }
   gl.disable(gl.CULL_FACE);
