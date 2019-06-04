@@ -253,9 +253,9 @@ window.onload = function() {
     oldCenter = center;
 
     // Update the water simulation and graphics
-    for(var i = 0; i < speed; i ++){
-      water.stepSimulation();
-    }
+    // for(var i = 0; i < speed; i ++){
+    //   water.stepSimulation();
+    // }
 
     water.addDrop(Math.random() * 1.0 -0.5 , 1.0 , 0.1, 0.0002);
     water.addDrop(Math.random() * 1.0 -0.5 , -1.0 , 0.1, 0.0002);

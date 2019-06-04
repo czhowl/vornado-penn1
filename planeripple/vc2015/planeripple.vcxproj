@@ -101,10 +101,14 @@
   <ItemGroup>
     <None Include="..\assets\displacement_map.frag" />
     <None Include="..\assets\displacement_map.vert" />
+    <None Include="..\assets\drop.frag" />
+    <None Include="..\assets\drop.vert" />
     <None Include="..\assets\mesh.frag" />
     <None Include="..\assets\mesh.vert" />
     <None Include="..\assets\normal_map.frag" />
     <None Include="..\assets\normal_map.vert" />
+    <None Include="..\assets\ripple.frag" />
+    <None Include="..\assets\ripple.vert" />
     <None Include="..\assets\shader.frag" />
     <None Include="..\assets\shader.vert" />
   </ItemGroup>

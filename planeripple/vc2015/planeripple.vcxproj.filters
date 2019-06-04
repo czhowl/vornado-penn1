@@ -62,5 +62,17 @@
     <None Include="..\assets\shader.frag">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="..\assets\ripple.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\ripple.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\drop.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\drop.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

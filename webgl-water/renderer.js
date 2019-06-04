@@ -120,7 +120,7 @@ function Renderer() {
           vec3 abovewaterColor = watercolor;\
           vec3 reflectedColor = getSurfaceRayColor(position, reflectedRay, abovewaterColor, suncolor, sunsize);\
           vec3 refractedColor = getSurfaceRayColor(position, refractedRay, abovewaterColor, suncolor, sunsize);\
-          gl_FragColor = vec4(mix(refractedColor, reflectedColor, -5.0), 1.0);\
+          gl_FragColor = vec4(mix(refractedColor, reflectedColor, fresnel), 1.0);\
         ' + '\
       }\
     ');

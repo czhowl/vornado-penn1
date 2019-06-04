@@ -1,5 +1,6 @@
 #version 150
 
+uniform sampler2D	uTex0;
 uniform float		uTime;
 uniform float		uAmplitude;
 
@@ -16,7 +17,7 @@ float wave( float period )
 float displace( vec2 uv )
 {
 	// large up and down movement
-	float d = wave( (uv.x * 0.5) - uTime * 0.01 );
+	float d = wave( (uv.x * 0.1) - uTime * 0.01 );
 	// add a large wave from left to right
 	d -= 1.2 * wave( (uv.x * 0.9) - uTime * 0.04 );
 	// add diagonal waves from back to front
@@ -31,6 +32,7 @@ float displace( vec2 uv )
 
 void main()
 {
-	float d = uAmplitude * displace( vTexCoord0.xy );
+	vec4 ripple = texture2D(uTex0, vec2(vTexCoord0.x, vTexCoord0.y));
+	float d = uAmplitude * displace( vTexCoord0.xy ) + ripple.r;
 	oColor = vec4( d, d, d, 1.0 );
 }
