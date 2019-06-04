@@ -33,6 +33,7 @@ var helperFunctions = '\
     vec3 wallColor;\
     vec3 normal;\
       wallColor = texture2D(tiles, point.xz * 0.1 + 0.5).rgb;\
+      wallColor = vec3(0.5);\
       normal = vec3(0.0, 1.0, 0.0);\
     \
     scale /= length(point); /* pool ambient occlusion */\
@@ -44,8 +45,6 @@ var helperFunctions = '\
     \
       vec4 caustic = texture2D(causticTex, 0.75 * (point.xz - point.y * refractedLight.xz / refractedLight.y) * 0.25 + 0.5);\
       scale += diffuse * caustic.r * 2.0 * caustic.g;\
-      \
-      scale += diffuse * 0.5;\
     \
     return wallColor * scale;\
     /*return vec3(1.0) * scale;*/\
@@ -59,8 +58,8 @@ function Renderer() {
     format: gl.RGB
   });
   this.lightDir = new GL.Vector(2.0, 2.0, -1.0).unit();
-  this.causticTex = new GL.Texture(1024, 1024);
-  this.waterMesh = GL.Mesh.plane({ detail: 200 });
+  this.causticTex = new GL.Texture(4096, 4096);
+  this.waterMesh = GL.Mesh.plane({ detail: 250 });
   this.waterShaders = [];
   for (var i = 0; i < 2; i++) {
     this.waterShaders[i] = new GL.Shader('\
@@ -84,10 +83,6 @@ function Renderer() {
       \
       vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor, vec3 suncolor, float sunsize) {\
         vec3 color;\
-        if (ray.y < 0.0) {\
-          vec2 t = intersectCube(origin, ray, vec3(-5.0, -poolHeight, -2.0), vec3(5.0, 2.0, 2.0));\
-          color = getWallColor(origin + ray * t.y);\
-        } else {\
           vec2 t = intersectCube(origin, ray, vec3(-5.0, -poolHeight, -2.0), vec3(5.0, 2.0, 2.0));\
           vec3 hit = origin + ray * t.y;\
           if (hit.y < 2.0 / 12.0) {\
@@ -96,7 +91,6 @@ function Renderer() {
             color = textureCube(sky, ray).rgb;\
             color += vec3(pow(max(0.0, dot(light, ray)), sunsize)) * suncolor;\
           }\
-        }\
         if (ray.y < 0.0) color *= waterColor;\
         return color;\
       }\
@@ -126,8 +120,7 @@ function Renderer() {
           vec3 abovewaterColor = watercolor;\
           vec3 reflectedColor = getSurfaceRayColor(position, reflectedRay, abovewaterColor, suncolor, sunsize);\
           vec3 refractedColor = getSurfaceRayColor(position, refractedRay, abovewaterColor, suncolor, sunsize);\
-          \
-          gl_FragColor = vec4(mix(refractedColor, reflectedColor, fresnel), 1.0);\
+          gl_FragColor = vec4(mix(refractedColor, reflectedColor, -5.0), 1.0);\
         ' + '\
       }\
     ');

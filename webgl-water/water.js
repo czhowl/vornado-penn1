@@ -38,6 +38,10 @@ function Water() {
       drop = 0.5 - cos(drop * PI) * 0.5;\
       info.r += drop * strength;\
       \
+      /*if(max(abs(coord.x * 3.0 - (center * 0.5 + 0.5).x),abs(coord.y * 0.5 - (center * 0.5 + 0.5).y)) < radius){\
+        info.r += 1.0 * strength;\
+      }*/\
+      \
       gl_FragColor = info;\
     }\
   ');

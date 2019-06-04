@@ -92,9 +92,9 @@ window.onload = function() {
   gravity = new GL.Vector(0, -4, 0);
   radius = 0.25;
 
-  for (var i = 0; i < 20; i++) {
-    water.addDrop(Math.random() * 2 - 1, Math.random() * 2 - 1, size, (i & 1) ? 0.01 : -0.01);
-  }
+  // for (var i = 0; i < 20; i++) {
+  //   water.addDrop(Math.random() * 2 - 1, Math.random() * 2 - 1, size, (i & 1) ? 0.01 : -0.01);
+  // }
 
   document.getElementById('loading').innerHTML = '';
   onresize();
