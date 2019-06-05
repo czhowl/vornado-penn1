@@ -1,5 +1,7 @@
 #version 150
 
+#include "util.frag"
+
 uniform sampler2D	uTex0;
 uniform float		uTime;
 uniform float		uAmplitude;
@@ -34,5 +36,7 @@ void main()
 {
 	vec4 ripple = texture2D(uTex0, vec2(vTexCoord0.x, vTexCoord0.y));
 	float d = uAmplitude * displace( vTexCoord0.xy ) + ripple.r;
-	oColor = vec4( d, d, d, 1.0 );
+	float n = uAmplitude * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 2)) + ripple.r;
+	//n = uAmplitude * snoise(vec4(n * 0.5, 1.0, uTime * 0.5, 1.0)) + ripple.r;
+	oColor = vec4( n, d, d, 1.0 );
 }

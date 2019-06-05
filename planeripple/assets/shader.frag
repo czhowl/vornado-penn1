@@ -33,4 +33,5 @@ void main()
 	//color += vec3(pow(max(0.0, dot(uLightDir, reflectedRay)), 50)) * sunColor;
 	// final color 
 	fragColor = vec4(color, 1.0);
+	//fragColor = vec4(vertPosition.x / 500.0, vertPosition.y / uAmplitude, vertPosition.x / 500.0 + vertPosition.y / uAmplitude, 1.0);
 }

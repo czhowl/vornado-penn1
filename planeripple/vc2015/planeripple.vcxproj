@@ -111,6 +111,7 @@
     <None Include="..\assets\ripple.vert" />
     <None Include="..\assets\shader.frag" />
     <None Include="..\assets\shader.vert" />
+    <None Include="..\assets\util.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\planerippleApp.cpp" />

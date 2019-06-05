@@ -54,6 +54,7 @@ class planerippleApp : public App {
 	float						mAmplitude;
 	float						mAmplitudeTarget;
 	float						mStrength;
+	float						mRadius;
 	vec3						mSunDir;
 
 	bool						mDrawTex;
@@ -76,18 +77,21 @@ void planerippleApp::setup()
 
 	mWaterBottom = gl::Texture2d::create(loadImage(loadAsset("tilesLT2.jpg")));
 
+	mCamera = CameraPersp(768, 768, 10.0f, 0.01f, 50000.0f);
 	mCameraUi = CameraUi(&mCamera, getWindow(), -1);
-	mCamera.lookAt(vec3(0.0f, 300.0f, 0.1f), vec3(0.0f, 0.0f, 0.0f));
-
+	mCamera.lookAt(vec3(0.0f, 10000.0f, 0.1f), vec3(0.0f, 0.0f, 0.0f));
+	mCamera.setFov(5);
 	mAmplitude = 0.0f;
 	mAmplitudeTarget = 2.0f;
 	mStrength = 1.0f;
+	mRadius = 0.1f;
 
 	mDrawTex = true;
 	mParams = params::InterfaceGl::create("Params", ivec2(220, 220));
 	mParams->addParam("amplitude", &mAmplitudeTarget).max(100.0).min(0.0).step(0.01f);
 	mParams->addParam("texture", &mDrawTex);
 	mParams->addParam("strength", &mStrength).max(10.0).min(0.0).step(0.01f);
+	mParams->addParam("drop size", &mRadius).max(0.5).min(0.0).step(0.01f);
 	compileShaders();
 
 	createMesh();
@@ -128,9 +132,9 @@ void planerippleApp::update()
 
 void planerippleApp::draw()
 {
-	gl::clear(Color(1.0,0.8,0.8));
-	gl::enableDepthRead();
-	gl::enableDepthWrite();
+	gl::clear(Color(1.0,0.95,0.95));
+	//gl::enableDepthRead();
+	//gl::enableDepthWrite();
 	// if enabled, show the displacement and normal maps
 	if (false) {
 		gl::color(Color(0.05f, 0.05f, 0.05f));
@@ -145,7 +149,7 @@ void planerippleApp::draw()
 
 	// setup render states
 	//gl::enableAdditiveBlending();
-	gl::enableAlphaBlending();
+	//gl::enableAlphaBlending();
 	if (mDispMapFbo && mNormalMapFbo && mMeshShader) {
 		// bind the displacement and normal maps, each to their own texture unit
 		gl::ScopedTextureBind tex0(mDispMapFbo->getColorTexture(), uint8_t(0));
@@ -168,8 +172,8 @@ void planerippleApp::draw()
 	}
 
 	// clean up after ourselves
-	gl::disableWireframe();
-	gl::disableAlphaBlending();
+	//gl::disableWireframe();
+	//gl::disableAlphaBlending();
 
 	gl::popMatrices();
 
@@ -177,7 +181,7 @@ void planerippleApp::draw()
 		gl::color(Color(1, 1, 1));
 		//gl::draw(mRippleFbo->getColorTexture(), vec2(0));
 		gl::draw(mRippleFboA->getColorTexture(), vec2(0));
-		gl::draw(mRippleFboB->getColorTexture(), vec2(512, 0));
+		//gl::draw(mRippleFboB->getColorTexture(), vec2(512, 0));
 	}
 
 	mParams->draw();
@@ -202,7 +206,7 @@ void planerippleApp::dropRipple()
 	mDropShader->uniform("uTex0", 0);
 	vec2 mousePos = getWindow()->getMousePos();
 	mDropShader->uniform("uCenter", vec2(mousePos.x / float(getWindow()->getWidth()), mousePos.y / float(getWindow()->getHeight())));
-	mDropShader->uniform("uRadius", 0.1f);
+	mDropShader->uniform("uRadius", mRadius);
 	mDropShader->uniform("uStrength", mStrength);
 
 	gl::drawSolidRect(mRippleFboB->getBounds());
@@ -310,8 +314,8 @@ void planerippleApp::prepare(Settings *settings)
 void planerippleApp::createMesh()
 {
 	// create vertex, normal and texcoord buffers
-	const int  RES_X = 200;
-	const int  RES_Z = 200;
+	const int  RES_X = 500;
+	const int  RES_Z = 100;
 	const vec3 size = vec3(500.0f, 1.0f, 100.0f);
 
 	std::vector<vec3> positions(RES_X * RES_Z);

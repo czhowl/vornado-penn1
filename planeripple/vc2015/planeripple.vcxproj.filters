@@ -74,5 +74,8 @@
     <None Include="..\assets\drop.vert">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="..\assets\util.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
