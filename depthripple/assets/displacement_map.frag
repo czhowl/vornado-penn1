@@ -38,7 +38,7 @@ void main()
 	// only sin waves
 	float d = uAmplitude * displace( vTexCoord0.xy ) + ripple.r;
 	// 4D simplex noise
-	d = uAmplitude * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 2)) + ripple.r;
+	d = uAmplitude * snoise(vec4(vTexCoord0.x * 5, 1.0, uTime * 0.5, vTexCoord0.y * 5)) + ripple.r;
 	// unknown pleasures
 	//n = uAmplitude * clamp((1 - abs(vTexCoord0.y - 0.5) * 3), 0, 1) * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 5)) + ripple.r;
 	// double 4D simplex noise - do not know the name of the pattern

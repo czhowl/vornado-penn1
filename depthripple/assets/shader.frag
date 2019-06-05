@@ -31,12 +31,12 @@ void main()
 
 	vec3 color = vec3(vAmp / (uAmplitude + 2.0) / 4 + 0.2);
 
-//	// graphic
-//	if(vAmp< uAmplitude / 2 + 0.1 && vAmp > uAmplitude / 2 - 0.1) color = vec3(0.0f);
-//	else if(vAmp > uAmplitude - 0.1) color = vec3(1.0f);
-//	else if(vAmp < -uAmplitude + 0.1) color = vec3(0.0f);
-//	// swirl
-//	color = vec3(mod(vAmp, 0.1f) * 5.0);
+	// graphic
+	if(vAmp< uAmplitude / 2 + 0.1 && vAmp > uAmplitude / 2 - 0.1) color = vec3(0.0f);
+	else if(vAmp > uAmplitude - 0.1) color = vec3(1.0f);
+	else if(vAmp < -uAmplitude + 0.1) color = vec3(0.0f);
+
+	color = vec3(mod(vAmp, 0.1f) * 5.0);
 
 	vec3 reflectedRay = reflect(normalize(vertPosition.xyz - uEyePos), Nfinal);
 //	color = textureCube(uSkyBox, reflectedRay).rgb;

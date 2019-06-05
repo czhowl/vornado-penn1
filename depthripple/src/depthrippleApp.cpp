@@ -5,20 +5,22 @@
 #include "cinder/params/Params.h"
 #include "cinder/Perlin.h"
 
+#include <librealsense2/rs.hpp>
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class planerippleApp : public App {
-  public:
+class depthrippleApp : public App {
+public:
 	void setup() override;
-	void mouseDown( MouseEvent event ) override;
+	void mouseDown(MouseEvent event) override;
 	void update() override;
 	void draw() override;
 	static void prepare(Settings *settings);
 	void keyDown(KeyEvent event) override;
 
-  private:
+private:
 	void						createMesh();
 	void						compileShaders();
 	void						renderDisplacementMap();
@@ -63,9 +65,25 @@ class planerippleApp : public App {
 	Perlin						mPerlin;
 	vec2						mWalker;
 	bool						mWalk;
+
+	// sensing
+
+	rs2::pipeline			realsense;
+	rs2::colorizer			color_map;
+	rs2::temporal_filter	temp_filter;
+
+	gl::Texture2dRef		mDepthTexture;
+	gl::Texture2dRef		mPrevDepthTexture;
+
+	vector<int>				depthArray;
+	vector<float>			prevDepthArray;
+
+	float					far = 1.5;
+	float					alpha = 0.0f;
+	float					scale = 8.0f;
 };
 
-void planerippleApp::setup()
+void depthrippleApp::setup()
 {
 	//mSkyTexture = gl::Texture2d::create(loadImage(loadAsset("sky.jpg")));
 	const ImageSourceRef box[6] = {
@@ -100,6 +118,7 @@ void planerippleApp::setup()
 	mParams->addParam("strength", &mStrength).max(10.0).min(0.0).step(0.01f);
 	mParams->addParam("drop size", &mRadius).max(0.5).min(0.0).step(0.01f);
 	mParams->addParam("Walker", &mWalk);
+	mParams->addParam("far clip", &far).max(2.0).min(0.0).step(0.01f);
 
 	compileShaders();
 
@@ -112,8 +131,8 @@ void planerippleApp::setup()
 	fmt.setColorTextureFormat(gl::Texture2d::Format().wrap(GL_CLAMP_TO_EDGE).internalFormat(GL_R32F));
 	mDispMapFbo = gl::Fbo::create(512, 512, fmt);
 	fmt.setColorTextureFormat(gl::Texture2d::Format().internalFormat(GL_RG32F));
-	mRippleFboA = gl::Fbo::create(1000, 200, fmt);
-	mRippleFboB = gl::Fbo::create(1000, 200, fmt);
+	mRippleFboA = gl::Fbo::create(512, 512, fmt);
+	mRippleFboB = gl::Fbo::create(512, 512, fmt);
 
 	// use 3 channels (rgb) for the normal map
 	fmt.setColorTextureFormat(gl::Texture2d::Format().wrap(GL_CLAMP_TO_EDGE).internalFormat(GL_RGB32F));
@@ -124,14 +143,71 @@ void planerippleApp::setup()
 	mSunDir = normalize(vec3(0.0f, 2.0f, 0.0f));
 
 	mPerlin.setSeed(clock());
+
+	rs2::config cfg;
+
+	//Add desired streams to configuration
+	//cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
+	cfg.enable_stream(RS2_STREAM_DEPTH, 640, 360, RS2_FORMAT_Z16, 60);
+	rs2::pipeline_profile profile = realsense.start(cfg);
+	color_map = rs2::colorizer(2);
+
+	depthArray.clear();
+	//mDepthTexture = gl::Texture::create(colorized_depth.get_data(), GL_RGB, width, height, gl::Texture::Format().loadTopDown());
+	for (int y = 6; y < 48; y += 6) {
+		for (int x = 1; x < 80; x += 2) {
+			depthArray.push_back(0);
+			prevDepthArray.push_back(0.0f);
+		}
+	}
 }
 
-void planerippleApp::mouseDown( MouseEvent event )
+void depthrippleApp::mouseDown(MouseEvent event)
 {
 }
 
-void planerippleApp::update()
+void depthrippleApp::update()
 {
+	rs2::frameset fs = realsense.wait_for_frames();
+	rs2::frame depth = fs.get_depth_frame();
+	rs2::frame filtered = depth;
+	rs2::decimation_filter  dec_filter;
+	dec_filter.set_option(RS2_OPTION_FILTER_MAGNITUDE, scale);
+	filtered = dec_filter.process(filtered);
+	rs2::threshold_filter thr_filter(0.15f, far);
+	filtered = thr_filter.process(filtered);
+	temp_filter.set_option(rs2_option::RS2_OPTION_FILTER_SMOOTH_DELTA, 100.0f);
+	temp_filter.set_option(rs2_option::RS2_OPTION_FILTER_SMOOTH_ALPHA, alpha);
+	filtered = temp_filter.process(filtered);
+	//filtered = disparity_to_depth.process(filtered);
+	auto colorized_depth = color_map.colorize(filtered);
+	int width = colorized_depth.get_width();
+	int height = colorized_depth.get_height();
+
+	Surface sf = Surface((uint8_t *)colorized_depth.get_data(), width, height, 3 * width, SurfaceChannelOrder::RGB);
+	mDepthTexture = gl::Texture::create(sf);
+
+	int i = 0;
+	//float d = sf.getPixel(ivec2(40, 24)).r;
+	//console() << d << endl;
+	for (int y = 6; y < 48; y += 6) {
+		for (int x = 1; x < 80; x += 2) {
+			float d = sf.getPixel(ivec2(x, y)).r;
+			
+			if (abs(d - prevDepthArray[i]) > 10) {
+				depthArray[i] = 1;
+				dropRipple(vec2(float(x) / 80.0, float(y) / 48.0));
+			}
+
+			prevDepthArray[i] = d;
+			//console() << depthArray[i] << "  ";
+			i++;
+		}
+		//console() << endl;;
+	}
+
+	// update
+
 	mAmplitude += 0.02f * (mAmplitudeTarget - mAmplitude);
 
 	updateRipple();
@@ -142,12 +218,12 @@ void planerippleApp::update()
 
 	float t = getElapsedSeconds();
 	if (mWalk) {
-		mWalker = mPerlin.dfBm(t * 0.02, t * 0.1) * 0.5f + 0.5f;
+		mWalker = mPerlin.dfBm(t * 0.1, t * 0.1) * 0.5f + 0.5f;
 		dropRipple(mWalker);
 	}
 }
 
-void planerippleApp::draw()
+void depthrippleApp::draw()
 {
 	gl::clear();// Color(1.0, 0.95, 0.95));
 	//gl::enableDepthRead();
@@ -199,13 +275,14 @@ void planerippleApp::draw()
 		//gl::draw(mRippleFbo->getColorTexture(), vec2(0));
 		gl::draw(mRippleFboA->getColorTexture(), vec2(0));
 		//gl::draw(mRippleFboB->getColorTexture(), vec2(512, 0));
+		gl::draw(mDepthTexture, vec2(50, 0));
 	}
 
 	mParams->draw();
 	//gl::draw(mWaterBottom);
 }
 
-void planerippleApp::dropRipple(vec2 pos)
+void depthrippleApp::dropRipple(vec2 pos)
 {
 	// bind frame buffer
 	gl::ScopedFramebuffer fbo(mRippleFboB);
@@ -233,7 +310,7 @@ void planerippleApp::dropRipple(vec2 pos)
 	std::swap(mRippleFboA, mRippleFboB);
 }
 
-void planerippleApp::updateRipple()
+void depthrippleApp::updateRipple()
 {
 	gl::ScopedFramebuffer fbo(mRippleFboB);
 
@@ -258,7 +335,7 @@ void planerippleApp::updateRipple()
 	std::swap(mRippleFboA, mRippleFboB);
 }
 
-void planerippleApp::renderDisplacementMap()
+void depthrippleApp::renderDisplacementMap()
 {
 	if (mDispMapShader && mDispMapFbo) {
 		// bind frame buffer
@@ -289,7 +366,7 @@ void planerippleApp::renderDisplacementMap()
 	//std::swap(mRippleFboA, mRippleFboB);
 }
 
-void planerippleApp::renderNormalMap()
+void depthrippleApp::renderNormalMap()
 {
 	if (mNormalMapShader && mNormalMapFbo) {
 		// bind frame buffer
@@ -320,19 +397,19 @@ void planerippleApp::renderNormalMap()
 	}
 }
 
-void planerippleApp::prepare(Settings *settings)
+void depthrippleApp::prepare(Settings *settings)
 {
 	settings->setTitle("Planar 3D Ripple");
 	settings->setWindowSize(768, 768);
 	settings->disableFrameRate();
 }
 
-void planerippleApp::createMesh()
+void depthrippleApp::createMesh()
 {
 	// create vertex, normal and texcoord buffers
-	const int  RES_X = 500;
-	const int  RES_Z = 100;
-	const vec3 size = vec3(500.0f, 1.0f, 100.0f);
+	const int  RES_X = 200;
+	const int  RES_Z = 200;
+	const vec3 size = vec3(200.0f, 1.0f, 200.0f);
 
 	std::vector<vec3> positions(RES_X * RES_Z);
 	std::vector<vec3> normals(RES_X * RES_Z);
@@ -384,7 +461,7 @@ void planerippleApp::createMesh()
 	mBatch = gl::Batch::create(mVboMesh, mMeshShader);
 }
 
-void planerippleApp::compileShaders()
+void depthrippleApp::compileShaders()
 {
 	try {
 		// this shader will render all colors using a change in hue
@@ -408,7 +485,7 @@ void planerippleApp::compileShaders()
 	}
 }
 
-void planerippleApp::keyDown(KeyEvent event)
+void depthrippleApp::keyDown(KeyEvent event)
 {
 	switch (event.getCode()) {
 	case KeyEvent::KEY_s:
@@ -425,5 +502,4 @@ void planerippleApp::keyDown(KeyEvent event)
 	}
 }
 
-
-CINDER_APP( planerippleApp, RendererGl(RendererGl::Options().msaa(16)), &planerippleApp::prepare)
+CINDER_APP( depthrippleApp, RendererGl )
