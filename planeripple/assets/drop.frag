@@ -1,4 +1,4 @@
-#version 150
+#version 400
 
 uniform sampler2D uTex0;
 

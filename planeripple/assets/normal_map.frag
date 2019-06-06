@@ -3,7 +3,7 @@
 //       would require branching, which would stall the GPU needlessly.
 //       You will notice incorrect normals at the edges of the normal map.
 
-#version 150
+#version 400
 
 uniform sampler2D uTex0;
 uniform float uAmplitude;

@@ -1,4 +1,4 @@
-#version 150
+#version 400
 #extension GL_NV_shadow_samplers_cube : enable
 #include "util.frag"
 
@@ -61,5 +61,5 @@ void main()
 //	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude + 0.5));
 //	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude));
 
-	fragColor = vec4(color, 1.0);
+	fragColor = vec4(color, 0.9);
 }
