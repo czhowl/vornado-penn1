@@ -35,15 +35,54 @@ float displace( vec2 uv )
 void main()
 {
 	vec4 ripple = texture2D(uTex0, vec2(vTexCoord0.x, vTexCoord0.y));
+
 	// only sin waves
 	float d = uAmplitude * displace( vTexCoord0.xy ) + ripple.r;
+
 	// 4D simplex noise
-	d = uAmplitude * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 2)) + ripple.r;
+//	d = uAmplitude * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 2)) + ripple.r;
+
 	// unknown pleasures
-	//n = uAmplitude * clamp((1 - abs(vTexCoord0.y - 0.5) * 3), 0, 1) * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 5)) + ripple.r;
+//	d = uAmplitude * clamp((1 - abs(vTexCoord0.y - 0.5) * 3), 0, 1) * snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.5, vTexCoord0.y * 5)) + ripple.r;
+	
 	// double 4D simplex noise - do not know the name of the pattern
-	//d = uAmplitude * snoise(vec4(d * 0.5,0.0,0.0, 1.0)) + ripple.r;
+//	d = uAmplitude * snoise(vec4(d * 0.5,0.0,0.0, 1.0)) + ripple.r;
+	
 	// double 4D simplex noise - do not know the name of the pattern
-	d = d;
+//	d = uAmplitude * snoise(vec4(d, 1.0, uTime * 0.5, 5.0)) + ripple.r;
+	
+	// larger noise noise + smaller noise = fur effect, looks good with plastic mesh shader
+//	d = (uAmplitude + 10) * (snoise(vec4(vTexCoord0.x * 5, 1.0, uTime * 0.2, vTexCoord0.y))) + ripple.r;
+//	d += (0 - d / uAmplitude) * (snoise(vec4(vTexCoord0.x * 5000, uTime * 1,1.0, vTexCoord0.y * 1000)));
+	
+	// Ocean / Clouds, with metal mesh shader will have the aluminium folio effect
+	d = 0;
+	for(float i = 0.0; i < 10.0; i += 1.0){
+		d += 1 / pow(2.0, i) * (uAmplitude + 10) * (snoise(vec4(vTexCoord0.x * 5 * pow(2.0, i), 1.0, uTime * 0.2, vTexCoord0.y * pow(2.0, i))));
+	}
+	d += ripple.r;
+	
+	// more dramatic
+//	d = 0;
+//	for(float i = 0.0; i < 10.0; i += 1.0){
+//		d += 1 / pow(2.0, i) * (uAmplitude + 10) * (snoise(vec4(vTexCoord0.x * 5 * pow(2.0, i), 1.0, uTime * 0.2, vTexCoord0.y * pow(2.0, i))));
+//	}
+//	d = d*d + ripple.r;
+	
+	// webs
+//	d = 0;
+//	for(float i = 0.0; i < 6.0; i += 1.0){
+//		d += abs(1 / pow(2.0, i) * (uAmplitude + 10) * (snoise(vec4(vTexCoord0.x * 5 * pow(2.0, i), 1.0, uTime * 0.2, vTexCoord0.y * pow(2.0, i)))));
+//	}
+//	d = abs(d);     // create creases
+////    d = pow(d, 2);
+//	d = 5 - d; // invert so creases are at top
+//	d += ripple.r;
+
+//	d = (snoise(vec4(vTexCoord0.x * 10, 1.0, uTime * 0.02, vTexCoord0.y * 2)));
+//	//d = snoise(vec4(d + snoise(vec4(d))));
+//	d = (uAmplitude) * snoise(vec4(d + snoise(vec4(d))));
+//	d += ripple.r;
+
 	oColor = vec4( d, d, d, 1.0 );
 }

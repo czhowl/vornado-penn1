@@ -1,8 +1,10 @@
 #version 150
 #extension GL_NV_shadow_samplers_cube : enable
+#include "util.frag"
 
 uniform sampler2D	uTexNormal;
 uniform samplerCube	uSkyBox;
+uniform sampler2D	uWaterBottom;
 
 uniform mat3 ciNormalMatrix;
 
@@ -29,8 +31,8 @@ void main()
 	float falloff = sin( max( dot( Nfinal, vec3(0.0, -1.0, 0.0) ), 0.0) * 2.25);	
 	float alpha = 0.5 * pow( falloff, 30.0 );
 
-	vec3 color = vec3(vAmp / (uAmplitude + 2.0) / 4 + 0.2);
-
+	vec3 color = vec3(vAmp / uAmplitude + 0.5);
+	//color = vec3(pow(vAmp / (uAmplitude + 2.0) / 4 + 0.5, 3));
 //	// graphic
 //	if(vAmp< uAmplitude / 2 + 0.1 && vAmp > uAmplitude / 2 - 0.1) color = vec3(0.0f);
 //	else if(vAmp > uAmplitude - 0.1) color = vec3(1.0f);
@@ -42,8 +44,22 @@ void main()
 //	color = textureCube(uSkyBox, reflectedRay).rgb;
 	vec3 sunColor = vec3(1.0);
 	//color += vec3(pow(max(0.0, dot(uLightDir, reflectedRay)), 50)) * sunColor;
+	
 	// final color 
 	fragColor = vec4(color, 1.0);
 	// plastic 
-	//fragColor = vec4(alpha);
+//	fragColor = vec4(alpha * 5);
+	// B&W
+//	if(vAmp > 1.0) fragColor = vec4(2.0);
+//	else fragColor = vec4(0.0);
+	// metal
+//	color = textureCube(uSkyBox, reflectedRay).rgb;
+//	fragColor = vec4(color, 1.0);
+	vec3 bw = vec3(vAmp / (uAmplitude + 2.0) / 4 + 0.2);
+	vec3 tex = texture( uWaterBottom, vec2(vTexCoord0.x, 1 - vTexCoord0.y) ).rgb;
+	color = vec3(mix(bw * vec3(1.8,1.5,1.1), tex, 0.5));
+//	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude + 0.5));
+//	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude));
+
+	fragColor = vec4(color, 1.0);
 }
