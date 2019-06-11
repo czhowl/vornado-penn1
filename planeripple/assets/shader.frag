@@ -12,11 +12,11 @@ uniform vec3 uLightDir;
 uniform vec3 uEyePos;
 uniform float uAmplitude;
 
-in vec4		vertPosition;
-in vec3		vertNormal;
-in vec4     vertUp;
+in vec4		vPosition;
+in vec3		vNormal;
+in vec4     vUp;
 in vec2		vTexCoord0;
-in float		vAmp;
+in float	vAmp;
 
 out vec4	fragColor;
 
@@ -26,8 +26,8 @@ void main()
 	vec3 Nmap = texture( uTexNormal, vTexCoord0.xy ).rgb;
 	// modify it with the original surfasce normal
 	const vec3 Ndirection = vec3(0.0, 1.0, 0.0);	// see: normal_map.frag (y-direction)
-	vec3 Nfinal = ciNormalMatrix * normalize( vertNormal + Nmap - Ndirection );
-
+	vec3 Nfinal = ciNormalMatrix * normalize( vNormal + Nmap - Ndirection );
+	//Nfinal = vNormal;
 	float falloff = sin( max( dot( Nfinal, vec3(0.0, -1.0, 0.0) ), 0.0) * 2.25);	
 	float alpha = 0.5 * pow( falloff, 30.0 );
 
@@ -40,7 +40,7 @@ void main()
 //	// swirl
 //	color = vec3(mod(vAmp, 0.1f) * 5.0);
 
-	vec3 reflectedRay = reflect(normalize(vertPosition.xyz - uEyePos), Nfinal);
+	vec3 reflectedRay = reflect(normalize(vPosition.xyz - uEyePos), Nfinal);
 //	color = textureCube(uSkyBox, reflectedRay).rgb;
 	vec3 sunColor = vec3(1.0);
 	//color += vec3(pow(max(0.0, dot(uLightDir, reflectedRay)), 50)) * sunColor;
@@ -61,5 +61,5 @@ void main()
 //	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude + 0.5));
 //	color = vec3(mix(bw, tex, 1 - vAmp / uAmplitude));
 
-	fragColor = vec4(color, 0.9);
+	fragColor = vec4(color, 1.0);
 }

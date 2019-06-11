@@ -12,8 +12,8 @@ in vec2			ciTexCoord0;
 out vec4		vertPosition;
 out vec3		vertNormal;
 out vec4        vertUp;
-out vec2		vTexCoord0;
-out float		vAmp;
+out vec2		vertTexCoord0;
+out float		vertAmp;
 
 void main()
 {
@@ -26,8 +26,8 @@ void main()
 	vertNormal = ciNormalMatrix * ciNormal;
 	vertUp = ciModelView * vec4(0, 1, 0, 0);
 
-	vTexCoord0 = ciTexCoord0;
-	vAmp = vertPosition.y;
+	vertTexCoord0 = ciTexCoord0;
+	vertAmp = vertPosition.y;
 	// vertex shader must always pass projection space position
 	gl_Position = ciModelViewProjection * displacedPosition;
 }

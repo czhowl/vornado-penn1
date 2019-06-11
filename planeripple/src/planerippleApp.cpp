@@ -183,6 +183,7 @@ void planerippleApp::draw()
 		mMeshShader->uniform("uLightDir", mSunDir);
 		mMeshShader->uniform("uEyePos", mCamera.getEyePoint());
 		mMeshShader->uniform("uAmplitude", mAmplitude);
+		mMeshShader->uniform("uTime", float(getElapsedSeconds()));
 
 		gl::color(Color::white());
 		mBatch->draw();
@@ -388,14 +389,14 @@ void planerippleApp::compileShaders()
 {
 	try {
 		// this shader will render all colors using a change in hue
-		//mBackgroundShader = gl::GlslProg::create(loadAsset("background.vert"), loadAsset("background.frag"));
+		//mBackgroundShader = gl::GlslProgdddddddddddddddd::create(loadAsset("background.vert"), loadAsset("background.frag"));
 		// this shader will render a displacement map to a floating point texture, updated every frame
 		mDispMapShader = gl::GlslProg::create(loadAsset("displacement_map.vert"), loadAsset("displacement_map.frag"));
 		// this shader will create a normal map based on the displacement map
 		mNormalMapShader = gl::GlslProg::create(loadAsset("normal_map.vert"), loadAsset("normal_map.frag"));
 		// this shader will use the displacement and normal maps to displace vertices of a mesh
 		//mMeshShader = gl::GlslProg::create(loadAsset("mesh.vert"), loadAsset("mesh.frag"));
-		mMeshShader = gl::GlslProg::create(loadAsset("shader.vert"), loadAsset("shader.frag"));
+		mMeshShader = gl::GlslProg::create(loadAsset("shader.vert"), loadAsset("shader.frag"), loadAsset("shader.geom"));
 
 		mDropShader = gl::GlslProg::create(loadAsset("drop.vert"), loadAsset("drop.frag"));
 
