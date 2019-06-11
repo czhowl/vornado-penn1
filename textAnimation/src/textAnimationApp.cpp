@@ -9,8 +9,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-#define SIZE 48
-#define LINES 18
+#define LINES 17
 
 class textAnimationApp : public App {
   public:
@@ -27,6 +26,10 @@ class textAnimationApp : public App {
 	int						mDelay;
 	int						mLineDelay;
 	string					mString = "          ";
+
+	string					mStringA = "HUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSHUSH";
+	string					mStringB = "WELCOME WELCOME WELCOME WELCOME WELCOME WELCOME WELCOME WELCOME WELCOME WELCOME ";
+	bool					mAutoAnimate = true;
 };
 
 void textAnimationApp::setup()
@@ -60,6 +63,7 @@ void textAnimationApp::setup()
 			line[i].animate(mString);
 		}
 	});
+	mParams->addParam("Auto Animation", &mAutoAnimate);
 }
 
 void textAnimationApp::mouseDown( MouseEvent event )
@@ -68,6 +72,12 @@ void textAnimationApp::mouseDown( MouseEvent event )
 
 void textAnimationApp::update()
 {
+	if (!line[LINES - 1].mIsAnimate && mAutoAnimate) {
+		for (int i = 0; i < LINES; i++) {
+			line[i].animate(mStringA);
+		}
+		swap(mStringA, mStringB);
+	}
 	for (int i = 0; i < LINES; i++) {
 		line[i].update();
 	}

@@ -1,5 +1,6 @@
 #include "line.h"
-
+#include <math.h>
+#define _USE_MATH_DEFINES
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -47,14 +48,19 @@ void TypeLine::update() {
 	if (mIsAnimate && (f % mInterval == 0) && (f - mAnimationStart > mLineDelay * mLine)) {
 		mIsAnimate = false;
 		for (int i = 0; i < LENGTH; i++) {
-			if (mStatus[i] != 2 && f - mAnimationStart - mLineDelay * mLine >= i * mCharDelay) {
-				mStatus[i]++;
-				mPrevStatus[i]--;
+			//if (mStatus[i] != 2 && f - mAnimationStart - mLineDelay * mLine >= (LENGTH - (f + i) % LENGTH - 1) * mCharDelay) {
+			int pos = LENGTH / 2 + cos(i * M_PI) * ((i + 1) / 2); //spawn from middle
+			//int pos = i; //regular pattern left to right;
+			console() << pos << endl;
+			if (mStatus[pos] != 2 && f - mAnimationStart - mLineDelay * mLine >= i * mCharDelay) {
+				mStatus[pos]++;
+				mPrevStatus[pos]--;
 				//i = 20;
 				mIsAnimate = true;
 			}
 		}
 	}
+	console() << "===========================" << endl;
 	if (!mIsAnimate) {
 		mPrevString = mString;
 	}
@@ -63,19 +69,19 @@ void TypeLine::update() {
 void TypeLine::draw() {
 	for (int i = 0; i < LENGTH; i++) {
 		if (mStatus[i] == 1) {
-			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2], vec2(-9, 0));
+			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2], vec2(-OFFSET, 0));
 		}
 		else if (mStatus[i] == 2) {
-			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2], vec2(-9, 0));
-			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2 + 1], vec2(-9, -SIZE / 2));
+			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2], vec2(-OFFSET, 0));
+			mTextureFont->drawString(string(1, mString[i]), mBounds[i * 2 + 1], vec2(-OFFSET, -SIZE / 2));
 		}
 
 		if (mPrevStatus[i] == 1) {
-			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2 + 1], vec2(-9, -SIZE / 2));
+			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2 + 1], vec2(-OFFSET, -SIZE / 2));
 		}
 		else if (mPrevStatus[i] == 2) {
-			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2], vec2(-9, 0));
-			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2 + 1], vec2(-9, -SIZE / 2));
+			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2], vec2(-OFFSET, 0));
+			mTextureFont->drawString(string(1, mPrevString[i]), mBounds[i * 2 + 1], vec2(-OFFSET, -SIZE / 2));
 		}
 	}
 }

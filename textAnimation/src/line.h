@@ -4,8 +4,9 @@
 
 using namespace std;
 
-#define SIZE 52
-#define LENGTH 36
+#define SIZE 57
+#define LENGTH 33
+#define OFFSET 4
 
 class TypeLine {
 public:
@@ -17,7 +18,7 @@ public:
 
 	void setLineDelay(int l) { mLineDelay = l; };
 	void setInterval(int i) { mInterval = i; };
-	void setCharDelay(int d) { mCharDelay = d; if (mCharDelay > mInterval) mCharDelay = mInterval; };
+	void setCharDelay(int d) { mCharDelay = d; };
 
 	string				mPrevString = " ";
 	string				mString = " ";
