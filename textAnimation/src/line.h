@@ -41,4 +41,5 @@ private:
 	vector<ci::Rectf>		mBounds;
 
 	int					mLine;
+	int					mCurrFrame;
 };

@@ -27,6 +27,8 @@ void TypeLine::setup(Font f, int line) {
 	mIsAnimate = false;
 
 	mLineDelay = 5;
+
+	mCurrFrame = 0;
 }
 
 void TypeLine::animate(string s) {
@@ -39,20 +41,20 @@ void TypeLine::animate(string s) {
 			mStatus[i] = 0;
 		}
 		mIsAnimate = true;
-		mAnimationStart = getElapsedFrames();
+		//mAnimationStart = getElapsedFrames();
+		mCurrFrame = 0;
 	}
 }
 
 void TypeLine::update() {
-	int f = getElapsedFrames();
-	if (mIsAnimate && (f % mInterval == 0) && (f - mAnimationStart > mLineDelay * mLine)) {
+	if (mIsAnimate && (mCurrFrame % mInterval == 0) && mCurrFrame / mInterval > mLineDelay * mLine) { // animating && hit the frame && hit that line
 		mIsAnimate = false;
 		for (int i = 0; i < LENGTH; i++) {
 			//if (mStatus[i] != 2 && f - mAnimationStart - mLineDelay * mLine >= (LENGTH - (f + i) % LENGTH - 1) * mCharDelay) {
 			int pos = LENGTH / 2 + cos(i * M_PI) * ((i + 1) / 2); //spawn from middle
 			//int pos = i; //regular pattern left to right;
 			console() << pos << endl;
-			if (mStatus[pos] != 2 && f - mAnimationStart - mLineDelay * mLine >= i * mCharDelay) {
+			if (mStatus[pos] != 2 && mCurrFrame / mInterval - mLineDelay * mLine >= i / 5 * mCharDelay) { // not finish animation && hit the frame && hit that line
 				mStatus[pos]++;
 				mPrevStatus[pos]--;
 				//i = 20;
@@ -64,6 +66,7 @@ void TypeLine::update() {
 	if (!mIsAnimate) {
 		mPrevString = mString;
 	}
+	mCurrFrame++;
 }
 
 void TypeLine::draw() {
